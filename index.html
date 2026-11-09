@@ -92,6 +92,35 @@
   .meta div { text-align: left; }
   .meta .rotulo { font: 700 10px/1 var(--texto); letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
   .meta .valor { font-family: var(--display); font-size: clamp(15px, 2vw, 20px); margin-top: 6px; line-height: 1.6; }
+
+  /* data do evento + contagem regressiva */
+  .evento { margin: 30px auto 0; }
+  .evento-data { margin: 0; font: 700 clamp(14px, 1.8vw, 17px)/1.4 var(--texto); }
+  .evento-rotulo { display: inline-block; font: 700 10px/1 var(--texto); letter-spacing: .08em; text-transform: uppercase;
+                   background: var(--amarelo); color: var(--navy); border-radius: 4px; padding: 5px 7px; margin-right: 10px; vertical-align: 2px; }
+  .contagem { display: flex; justify-content: center; gap: clamp(8px, 2vw, 14px); margin-top: 16px; }
+  .contagem div {
+    min-width: clamp(64px, 12vw, 96px); padding: 12px 8px 10px; border-radius: 8px;
+    background: rgba(255, 255, 255, .14); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .4);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .contagem b { display: block; font: 400 clamp(20px, 3.6vw, 36px)/1.5 var(--display); font-variant-numeric: tabular-nums; }
+  .contagem span { display: block; font: 700 10px/1 var(--texto); letter-spacing: .08em; text-transform: uppercase; opacity: .9; }
+  .contagem-fim { margin: 16px 0 0; font-size: clamp(16px, 2.6vw, 26px); line-height: 1.5; color: var(--amarelo); }
+
+  /* portão: código do grupo */
+  .portao { max-width: 440px; margin: 36px auto 0; text-align: left; }
+  .portao label { display: block; font: 700 11px/1 var(--texto); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; text-align: center; }
+  .portao-linha { display: flex; gap: 8px; background: var(--branco); border-radius: 8px; padding: 6px; box-shadow: 0 10px 30px -10px rgba(0, 25, 65, .45); }
+  .portao input {
+    flex: 1; min-width: 0; border: 0; background: transparent; color: var(--navy); padding: 10px 12px;
+    font: 600 17px/1.2 var(--texto); letter-spacing: .06em; text-transform: uppercase;
+  }
+  .portao input::placeholder { text-transform: none; letter-spacing: 0; font-weight: 500; }
+  .portao input:focus { outline: none; }
+  .portao-linha:focus-within { box-shadow: 0 0 0 3px var(--amarelo), 0 10px 30px -10px rgba(0, 25, 65, .45); }
+  .portao-msg { margin: 12px 0 0; text-align: center; font-size: 14px; opacity: .95; min-height: 1.6em; }
+  .portao-msg.erro { color: var(--navy); background: var(--amarelo); border-radius: 6px; padding: 6px 10px; opacity: 1; }
   .voador { position: absolute; width: clamp(110px, 16vw, 210px); right: 7%; bottom: 70px; z-index: 2; animation: flutuar 5s ease-in-out infinite; }
   @keyframes flutuar { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-14px) rotate(-2deg); } }
   @media (prefers-reduced-motion: reduce) { .voador { animation: none; } html { scroll-behavior: auto; } }
@@ -105,6 +134,8 @@
   .degrade { background: linear-gradient(90deg, var(--celeste), var(--rosa)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .intro p { margin: 0 0 18px; color: var(--ardosia); font-size: 17px; }
   .intro p strong { color: var(--navy); }
+  .intro .valor-aviso { display: inline-block; background: var(--areia); border-left: 4px solid var(--laranja); border-radius: 6px; padding: 10px 14px; color: var(--navy); }
+  .meta .valor-min { color: var(--amarelo); }
 
   .postal {
     position: relative; margin-top: 56px; background: var(--creme); color: var(--navy);
@@ -254,7 +285,7 @@
       <span class="sep"></span>
       <small>Lista de desejos da equipe</small>
     </a>
-    <div class="nav-links">
+    <div class="nav-links" id="nav-links" hidden>
       <a class="btn claro sem-seta" href="#lista">Ver a lista</a>
       <a class="btn" href="#enviar">Enviar sugestão</a>
     </div>
@@ -273,12 +304,37 @@
         </g></svg>2026</span>
     </h1>
     <p class="lema display">Peça o que <em>você</em> quer ganhar</p>
-    <div class="meta" aria-live="polite">
-      <div><div class="rotulo">Participantes</div><div class="valor" id="hero-total">—</div></div>
-      <div><div class="rotulo">Já enviaram</div><div class="valor" id="hero-enviaram">—</div></div>
-      <div><div class="rotulo">Sugestões</div><div class="valor" id="hero-sugestoes">—</div></div>
+
+    <div class="evento">
+      <p class="evento-data"><span class="evento-rotulo">A troca</span>Sábado, 5 de dezembro · a partir das 17:00</p>
+      <div class="contagem" id="contagem" aria-hidden="true">
+        <div><b id="cd-dias">--</b><span>dias</span></div>
+        <div><b id="cd-horas">--</b><span>horas</span></div>
+        <div><b id="cd-min">--</b><span>min</span></div>
+        <div><b id="cd-seg">--</b><span>seg</span></div>
+      </div>
+      <p class="contagem-fim display" id="contagem-fim" hidden></p>
     </div>
-    <a class="btn" href="#enviar">Enviar minha sugestão</a>
+
+    <form class="portao" id="portao" novalidate>
+      <label for="f-codigo">Código do grupo</label>
+      <div class="portao-linha">
+        <input type="password" id="f-codigo" autocomplete="current-password" spellcheck="false"
+               autocapitalize="characters" placeholder="Ex.: NATAL-XXXXX">
+        <button type="submit" class="btn" id="btn-entrar">Entrar</button>
+      </div>
+      <p class="portao-msg" id="portao-msg" role="status">O código está no grupo da equipe.</p>
+    </form>
+
+    <div id="hero-aberto" hidden>
+      <div class="meta" aria-live="polite">
+        <div><div class="rotulo">Participantes</div><div class="valor" id="hero-total">—</div></div>
+        <div><div class="rotulo">Já enviaram</div><div class="valor" id="hero-enviaram">—</div></div>
+        <div><div class="rotulo">Sugestões</div><div class="valor" id="hero-sugestoes">—</div></div>
+        <div><div class="rotulo">Valor mínimo</div><div class="valor valor-min">R$ 150</div></div>
+      </div>
+      <a class="btn" href="#enviar">Enviar minha sugestão</a>
+    </div>
   </div>
 
   <svg class="voador" viewBox="0 0 220 170" aria-hidden="true">
@@ -302,7 +358,7 @@
   </div>
 </header>
 
-<section class="secao" id="enviar">
+<section class="secao restrito" id="enviar" hidden>
   <div class="container">
     <div class="intro">
       <h2 class="titulo-grande display">Sua lista,<br>nosso <span class="degrade">segredo</span></h2>
@@ -310,13 +366,14 @@
         <p><strong>A lista</strong> é aberta: todo mundo vê o que todo mundo pediu, e quem te tirou acerta no presente.</p>
         <p><strong>O sorteio</strong> é secreto: só você sabe quem tirou, então nada de entregar o jogo por aqui.</p>
         <p><strong>O presente</strong>, sem erro: mande até 6 ideias, com link da loja, foto e detalhes como tamanho e cor.</p>
+        <p class="valor-aviso"><strong>Valor mínimo: R$ 150,00.</strong> Sugira presentes a partir desse valor.</p>
       </div>
     </div>
 
     <form class="postal" id="form" novalidate>
       <div>
         <h2 class="display" id="form-titulo">Sua sugestão</h2>
-        <p class="dica" id="form-dica">Pode enviar mais de uma, até 6 por pessoa.</p>
+        <p class="dica" id="form-dica">Valor mínimo: R$ 150,00. Pode enviar até 6 sugestões.</p>
 
         <div class="campo">
           <label for="f-nome">De (seu nome)</label>
@@ -374,7 +431,7 @@
   </div>
 </section>
 
-<section class="ceu lista" id="lista">
+<section class="ceu lista restrito" id="lista" hidden>
   <svg class="nuvem-alta" style="left:8%;top:40px;width:180px" aria-hidden="true"><use href="#i-nuvem"/></svg>
   <svg class="nuvem-alta" style="right:4%;top:120px;width:220px" aria-hidden="true"><use href="#i-nuvem"/></svg>
   <svg class="aviao" viewBox="0 0 100 50" aria-hidden="true"><path d="M2 24 98 2 40 30z" fill="#fff"/><path d="M40 30 98 2 52 46z" fill="#e8e2f7"/><path d="M40 30l6 16 6-2z" fill="#b9b2ee"/></svg>
@@ -433,7 +490,10 @@ const ULTIMO_NOME = 'amigo-secreto-2026:nome';
 const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-const E = { participantes: [], pedidos: [], editando: null, foto: null, removerFoto: false, enviando: false };
+const CODIGO = 'amigo-secreto-2026:codigo';
+
+const E = { participantes: [], pedidos: [], editando: null, foto: null, removerFoto: false, enviando: false,
+            codigo: '', liberado: false };
 const $ = (id) => document.getElementById(id);
 
 // ── armazenamento local (pode estar indisponível) ──────────────
@@ -446,16 +506,23 @@ function esquecerChave(id) { const c = minhasChaves(); delete c[id]; gravarLocal
 // ══════════════════════════════════════════════════════════════
 // API
 // ══════════════════════════════════════════════════════════════
+// o código do grupo vai em toda chamada; o servidor confere e recusa sem ele
 async function api(dados) {
   const opts = dados
-    ? { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dados) }
+    ? { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ codigo: E.codigo }, dados)) }
     : {};
-  const url = dados ? API : API + '?acao=listar&t=' + Date.now();
+  const url = dados ? API
+    : API + '?acao=listar&codigo=' + encodeURIComponent(E.codigo || '') + '&t=' + Date.now();
   let r;
   try { r = await fetch(url, opts); } catch (e) { throw new Error('Sem conexão com o servidor. Verifique a internet e tente de novo.'); }
   let j;
   try { j = await r.json(); } catch (e) { throw new Error('O servidor não respondeu como esperado. Tente de novo em instantes.'); }
-  if (!j.ok) throw new Error(j.erro || 'Algo deu errado.');
+  if (!j.ok) {
+    const err = new Error(j.erro || 'Algo deu errado.');
+    err.codigoInvalido = !!j.codigoInvalido;
+    throw err;
+  }
   return j;
 }
 
@@ -466,13 +533,62 @@ async function carregar(silencioso) {
     const j = await api();
     E.participantes = j.participantes || [];
     E.pedidos = j.pedidos || [];
+    liberar();
     montarNomes();
     render();
   } catch (e) {
-    if (!silencioso) mural(aviso('⚠️', e.message));
+    if (e.codigoInvalido) { bloquear('Código incorreto. Confira no grupo da equipe.'); return; }
+    if (!E.liberado) portaoMsg(e.message, true);
+    else if (!silencioso) mural(aviso('⚠️', e.message));
   } finally {
     btn.disabled = false;
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Portão (código do grupo)
+// ══════════════════════════════════════════════════════════════
+function portaoMsg(texto, erro) {
+  const m = $('portao-msg');
+  m.textContent = texto;
+  m.classList.toggle('erro', !!erro);
+}
+
+function liberar() {
+  if (E.liberado) return;
+  E.liberado = true;
+  gravarLocal(CODIGO, E.codigo);
+  $('portao').hidden = true;
+  $('hero-aberto').hidden = false;
+  $('nav-links').hidden = false;
+  document.querySelectorAll('.restrito').forEach((s) => { s.hidden = false; });
+}
+
+function bloquear(msg) {
+  E.liberado = false;
+  E.codigo = '';
+  gravarLocal(CODIGO, null);
+  E.participantes = []; E.pedidos = [];
+  $('portao').hidden = false;
+  $('hero-aberto').hidden = true;
+  $('nav-links').hidden = true;
+  document.querySelectorAll('.restrito').forEach((s) => { s.hidden = true; });
+  mural();
+  $('btn-entrar').disabled = false;
+  portaoMsg(msg || 'O código está no grupo da equipe.', !!msg);
+  $('f-codigo').focus();
+}
+
+async function entrar(ev) {
+  if (ev) ev.preventDefault();
+  const c = $('f-codigo').value.replace(/\s+/g, '').toUpperCase();
+  if (!c) { portaoMsg('Digite o código do grupo.', true); return; }
+  E.codigo = c;
+  $('btn-entrar').disabled = true;
+  portaoMsg('Verificando…');
+  await carregar(false);
+  $('btn-entrar').disabled = false;
+  if (E.liberado) $('f-codigo').value = '';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -507,7 +623,7 @@ function limparForm() {
   $('f-foto').value = '';
   $('f-nome').disabled = false;
   $('form-titulo').textContent = 'Sua sugestão';
-  $('form-dica').textContent = 'Pode enviar mais de uma, até 6 por pessoa.';
+  $('form-dica').textContent = 'Valor mínimo: R$ 150,00. Pode enviar até 6 sugestões.';
   $('btn-enviar').textContent = 'Enviar sugestão';
   $('btn-cancelar').hidden = true;
   mostrarFoto(null);
@@ -770,10 +886,39 @@ let espera;
 $('busca').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(render, 200); });
 $('filtro-pessoa').addEventListener('change', render);
 
-// atualiza o mural sozinho a cada 2 min (sem atrapalhar quem está digitando)
-setInterval(() => { if (!document.hidden && !E.enviando) carregar(true); }, 120000);
+$('portao').addEventListener('submit', entrar);
 
-carregar(false);
+// ── contagem regressiva para a troca de presentes ──────────────
+const EVENTO = new Date('2026-12-05T17:00:00-03:00');   // horário de Petrolina (UTC-3)
+const FIM_EVENTO = new Date('2026-12-06T00:00:00-03:00');
+function contagem() {
+  const agora = Date.now();
+  const falta = EVENTO.getTime() - agora;
+  if (falta <= 0) {
+    $('contagem').hidden = true;
+    const fim = $('contagem-fim');
+    fim.hidden = false;
+    fim.textContent = agora < FIM_EVENTO.getTime() ? 'É hoje! A festa já começou 🎉' : 'Obrigado por participar! 🎁';
+    return false;
+  }
+  const s = Math.floor(falta / 1000);
+  $('cd-dias').textContent = Math.floor(s / 86400);
+  $('cd-horas').textContent = String(Math.floor(s % 86400 / 3600)).padStart(2, '0');
+  $('cd-min').textContent = String(Math.floor(s % 3600 / 60)).padStart(2, '0');
+  $('cd-seg').textContent = String(s % 60).padStart(2, '0');
+  return true;
+}
+if (contagem()) { const t = setInterval(() => { if (!contagem()) clearInterval(t); }, 1000); }
+
+// atualiza o mural sozinho a cada 2 min (sem atrapalhar quem está digitando)
+setInterval(() => { if (E.liberado && !document.hidden && !E.enviando) carregar(true); }, 120000);
+
+// entra direto se o código já foi digitado antes neste aparelho
+(function iniciar() {
+  const salvo = lerLocal(CODIGO, '');
+  if (salvo) { $('f-codigo').value = salvo; entrar(); }
+  else portaoMsg('O código está no grupo da equipe.');
+})();
 </script>
 </body>
 </html>
