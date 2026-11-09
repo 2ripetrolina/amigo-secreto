@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amigo Secreto 2026</title>
+<meta name="description" content="Lista de desejos do amigo secreto: cada pessoa sugere o que gostaria de ganhar.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbf7f2;
+    --superficie: #ffffff;
+    --superficie-2: #f4eee6;
+    --texto: #2a2420;
+    --texto-sec: #6f655d;
+    --borda: #e6ddd2;
+    --vermelho: #b3261e;
+    --vermelho-suave: #f9e3e1;
+    --verde: #1e6b47;
+    --verde-suave: #dff0e6;
+    --dourado: #b7862f;
+    --foco: #1e6b47;
+    --botao: #b3261e;
+    --sombra: 0 1px 2px rgba(42, 36, 32, .06), 0 4px 16px rgba(42, 36, 32, .06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171412; --superficie: #211d1a; --superficie-2: #2a2521; --texto: #f1ebe4;
+      --texto-sec: #b3a89d; --borda: #3a332d; --vermelho: #ff8a80; --vermelho-suave: #3b2220;
+      --verde: #7fd1a6; --verde-suave: #1d3328; --dourado: #e2b866; --foco: #7fd1a6; --botao: #b8443b;
+      --sombra: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171412; --superficie: #211d1a; --superficie-2: #2a2521; --texto: #f1ebe4;
+    --texto-sec: #b3a89d; --borda: #3a332d; --vermelho: #ff8a80; --vermelho-suave: #3b2220;
+    --verde: #7fd1a6; --verde-suave: #1d3328; --dourado: #e2b866; --foco: #7fd1a6; --botao: #b8443b;
+    --sombra: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--texto);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .pagina { max-width: 1240px; margin: 0 auto; padding: 0 16px 64px; }
+  a { color: var(--verde); }
+  :focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; border-radius: 4px; }
+
+  header.topo { padding: 36px 0 20px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; }
+  .marca { display: flex; gap: 14px; align-items: center; }
+  .marca .laco { font-size: 44px; line-height: 1; }
+  h1 { font: 700 clamp(28px, 5vw, 40px)/1.1 Fraunces, Georgia, serif; margin: 0; letter-spacing: -.01em; }
+  .subtitulo { margin: 4px 0 0; color: var(--texto-sec); }
+  .acoes-topo { display: flex; gap: 8px; }
+
+  .progresso { background: var(--superficie); border: 1px solid var(--borda); border-radius: 14px; padding: 14px 16px; box-shadow: var(--sombra); }
+  .progresso-linha { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 15px; }
+  .barra { height: 8px; background: var(--superficie-2); border-radius: 99px; margin: 10px 0 4px; overflow: hidden; }
+  .barra > span { display: block; height: 100%; background: linear-gradient(90deg, var(--verde), var(--dourado)); border-radius: 99px; transition: width .4s; }
+  details.faltam summary { cursor: pointer; color: var(--texto-sec); font-size: 14px; margin-top: 6px; }
+  .faltam-lista { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { font-size: 13px; padding: 3px 10px; border-radius: 99px; background: var(--superficie-2); color: var(--texto-sec); }
+
+  .layout { display: grid; grid-template-columns: 360px 1fr; gap: 24px; margin-top: 24px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  .cartao { background: var(--superficie); border: 1px solid var(--borda); border-radius: 16px; padding: 20px; box-shadow: var(--sombra); }
+  .form { position: sticky; top: 16px; }
+  @media (max-width: 860px) { .form { position: static; } }
+  .form h2 { font: 600 22px/1.2 Fraunces, Georgia, serif; margin: 0 0 4px; }
+  .form .dica { color: var(--texto-sec); font-size: 14px; margin: 0 0 16px; }
+  .campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .campo label { font-weight: 600; font-size: 14px; }
+  .campo .opcional { font-weight: 400; color: var(--texto-sec); }
+  input[type="text"], input[type="url"], input[type="search"], select, textarea {
+    font: inherit; color: var(--texto); background: var(--bg); width: 100%;
+    border: 1px solid var(--borda); border-radius: 10px; padding: 10px 12px;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  select:disabled { opacity: .7; }
+
+  .foto { border: 1.5px dashed var(--borda); border-radius: 12px; padding: 12px; text-align: center; background: var(--bg); }
+  .foto input { display: none; }
+  .foto .escolher { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--verde); font-weight: 600; }
+  .foto img { display: block; max-width: 100%; max-height: 200px; margin: 0 auto 10px; border-radius: 8px; }
+  .foto .remover { margin-left: 10px; }
+
+  button {
+    font: inherit; font-weight: 600; cursor: pointer; border-radius: 10px; padding: 10px 16px;
+    border: 1px solid transparent; background: var(--botao); color: #fff;
+  }
+  button.secundario { background: transparent; border-color: var(--borda); color: var(--texto); }
+  button.link { background: none; border: none; padding: 4px 6px; color: var(--texto-sec); font-weight: 500; }
+  button.link:hover { color: var(--texto); }
+  button.perigo { color: var(--vermelho); }
+  button:disabled { opacity: .55; cursor: progress; }
+  .botoes { display: flex; gap: 8px; flex-wrap: wrap; }
+  .botoes .primario { flex: 1; }
+
+  .msg { margin: 12px 0 0; font-size: 14px; padding: 10px 12px; border-radius: 10px; }
+  .msg.ok { background: var(--verde-suave); color: var(--verde); }
+  .msg.erro { background: var(--vermelho-suave); color: var(--vermelho); }
+
+  .ferramentas { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .ferramentas input { flex: 1 1 220px; }
+  .ferramentas select { flex: 0 1 240px; }
+
+  .pessoa { margin-bottom: 28px; }
+  .pessoa h3 { font: 600 20px/1.2 Fraunces, Georgia, serif; margin: 0 0 12px; display: flex; gap: 10px; align-items: baseline; }
+  .pessoa h3 small { font: 400 13px system-ui, sans-serif; color: var(--texto-sec); }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+  .presente { background: var(--superficie); border: 1px solid var(--borda); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--sombra); }
+  .presente.meu { border-color: var(--dourado); }
+  .presente .img { aspect-ratio: 4 / 3; background: var(--superficie-2); display: grid; place-items: center; font-size: 44px; overflow: hidden; }
+  .presente .img img { width: 100%; height: 100%; object-fit: cover; }
+  .presente .corpo { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .presente h4 { margin: 0; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; }
+  .presente p { margin: 0; color: var(--texto-sec); font-size: 14px; overflow-wrap: anywhere; white-space: pre-line; }
+  .presente .rodape { margin-top: auto; padding-top: 6px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .presente .abrir { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; font-size: 14px; text-decoration: none; padding: 6px 10px; border-radius: 8px; background: var(--verde-suave); color: var(--verde); }
+  .selo-meu { font-size: 12px; color: var(--dourado); font-weight: 600; }
+
+  .vazio { text-align: center; color: var(--texto-sec); padding: 48px 16px; }
+  .carregando { text-align: center; color: var(--texto-sec); padding: 48px 16px; }
+  footer { margin-top: 40px; color: var(--texto-sec); font-size: 13px; text-align: center; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <header class="topo">
+    <div class="marca">
+      <span class="laco" aria-hidden="true">🎁</span>
+      <div>
+        <h1>Amigo Secreto 2026</h1>
+        <p class="subtitulo">Sugira o que você gostaria de ganhar. A lista é aberta; o sorteio é que é secreto 🤫</p>
+      </div>
+    </div>
+    <div class="acoes-topo">
+      <button class="secundario" id="btn-atualizar" title="Recarregar a lista">↻ Atualizar</button>
+      <button class="secundario" id="btn-tema" title="Alternar tema claro/escuro" aria-label="Alternar tema">◐</button>
+    </div>
+  </header>
+
+  <section class="progresso" id="progresso" hidden>
+    <div class="progresso-linha">
+      <span><strong id="qtd-enviaram">0</strong> de <strong id="qtd-total">0</strong> pessoas já sugeriram presentes</span>
+      <span id="qtd-pedidos"></span>
+    </div>
+    <div class="barra"><span id="barra" style="width:0"></span></div>
+    <details class="faltam" id="faltam" hidden>
+      <summary>Quem ainda não enviou (<span id="qtd-faltam">0</span>)</summary>
+      <div class="faltam-lista" id="faltam-lista"></div>
+    </details>
+  </section>
+
+  <div class="layout">
+    <form class="cartao form" id="form" novalidate>
+      <h2 id="form-titulo">Sua sugestão</h2>
+      <p class="dica" id="form-dica">Pode enviar mais de uma, até 6 por pessoa.</p>
+
+      <div class="campo">
+        <label for="f-nome">Seu nome</label>
+        <select id="f-nome" required><option value="">Carregando…</option></select>
+      </div>
+      <div class="campo">
+        <label for="f-presente">O que você gostaria de ganhar?</label>
+        <input type="text" id="f-presente" maxlength="120" placeholder="Ex.: Livro “Torto Arado”" required>
+      </div>
+      <div class="campo">
+        <label for="f-link">Link da loja <span class="opcional">(opcional)</span></label>
+        <input type="url" id="f-link" inputmode="url" placeholder="https://…">
+      </div>
+      <div class="campo">
+        <label>Foto <span class="opcional">(opcional)</span></label>
+        <div class="foto" id="foto">
+          <img id="foto-previa" alt="Prévia da foto escolhida" hidden>
+          <label class="escolher" for="f-foto">📷 <span id="foto-rotulo">Escolher foto</span></label>
+          <button type="button" class="link perigo remover" id="foto-remover" hidden>Remover</button>
+          <input type="file" id="f-foto" accept="image/*">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="f-detalhes">Detalhes <span class="opcional">(opcional)</span></label>
+        <textarea id="f-detalhes" maxlength="400" placeholder="Tamanho, cor, voltagem, sabor…"></textarea>
+      </div>
+
+      <div class="botoes">
+        <button type="submit" class="primario" id="btn-enviar">Enviar sugestão</button>
+        <button type="button" class="secundario" id="btn-cancelar" hidden>Cancelar</button>
+      </div>
+      <p class="msg" id="msg" role="status" hidden></p>
+    </form>
+
+    <main>
+      <div class="ferramentas">
+        <input type="search" id="busca" placeholder="Buscar presente ou pessoa…" aria-label="Buscar">
+        <select id="filtro-pessoa" aria-label="Filtrar por pessoa"><option value="">Todas as pessoas</option></select>
+      </div>
+      <div id="mural"><p class="carregando">Carregando a lista…</p></div>
+    </main>
+  </div>
+
+  <footer>As sugestões ficam guardadas numa planilha da organização. Você pode editar ou apagar as suas neste mesmo aparelho.</footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// Configuração
+// ══════════════════════════════════════════════════════════════
+const API = 'https://script.google.com/macros/s/AKfycbyd991KXM4uQIj_Fk-X48ykP_CO8GLdHXJeu2g-0NUp1fAWJSbE4WSnY_EAnuSLwIUV/exec';
+const LADO_MAX_FOTO = 1200;          // px — a foto é reduzida antes de enviar
+const QUALIDADE_FOTO = 0.85;
+const CHAVES = 'amigo-secreto-2026:chaves';
+const ULTIMO_NOME = 'amigo-secreto-2026:nome';
+
+const E = { participantes: [], pedidos: [], editando: null, foto: null, removerFoto: false, enviando: false };
+const $ = (id) => document.getElementById(id);
+
+// ── armazenamento local (pode estar indisponível) ──────────────
+function lerLocal(k, padrao) { try { const v = localStorage.getItem(k); return v == null ? padrao : JSON.parse(v); } catch (e) { return padrao; } }
+function gravarLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignora */ } }
+const minhasChaves = () => lerLocal(CHAVES, {});
+function guardarChave(id, chave) { const c = minhasChaves(); c[id] = chave; gravarLocal(CHAVES, c); }
+function esquecerChave(id) { const c = minhasChaves(); delete c[id]; gravarLocal(CHAVES, c); }
+
+// ══════════════════════════════════════════════════════════════
+// API
+// ══════════════════════════════════════════════════════════════
+async function api(dados) {
+  const opts = dados
+    ? { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dados) }
+    : {};
+  const url = dados ? API : API + '?acao=listar&t=' + Date.now();
+  let r;
+  try { r = await fetch(url, opts); } catch (e) { throw new Error('Sem conexão com o servidor. Verifique a internet e tente de novo.'); }
+  let j;
+  try { j = await r.json(); } catch (e) { throw new Error('O servidor não respondeu como esperado. Tente de novo em instantes.'); }
+  if (!j.ok) throw new Error(j.erro || 'Algo deu errado.');
+  return j;
+}
+
+async function carregar(silencioso) {
+  const btn = $('btn-atualizar');
+  btn.disabled = true;
+  try {
+    const j = await api();
+    E.participantes = j.participantes || [];
+    E.pedidos = j.pedidos || [];
+    montarNomes();
+    render();
+  } catch (e) {
+    if (!silencioso) mural(vazio('⚠️', e.message));
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Formulário
+// ══════════════════════════════════════════════════════════════
+function montarNomes() {
+  const sel = $('f-nome');
+  const atual = sel.value || lerLocal(ULTIMO_NOME, '');
+  sel.textContent = '';
+  sel.add(new Option('Escolha seu nome…', ''));
+  E.participantes.forEach((n) => sel.add(new Option(n, n)));
+  if (E.participantes.indexOf(atual) >= 0) sel.value = atual;
+
+  const filtro = $('filtro-pessoa');
+  const f = filtro.value;
+  filtro.textContent = '';
+  filtro.add(new Option('Todas as pessoas', ''));
+  E.participantes.forEach((n) => filtro.add(new Option(n, n)));
+  filtro.value = E.participantes.indexOf(f) >= 0 ? f : '';
+}
+
+function mensagem(texto, tipo) {
+  const m = $('msg');
+  m.textContent = texto || '';
+  m.className = 'msg ' + (tipo || '');
+  m.hidden = !texto;
+}
+
+function limparForm() {
+  E.editando = null; E.foto = null; E.removerFoto = false;
+  $('f-presente').value = ''; $('f-link').value = ''; $('f-detalhes').value = '';
+  $('f-foto').value = '';
+  $('f-nome').disabled = false;
+  $('form-titulo').textContent = 'Sua sugestão';
+  $('form-dica').textContent = 'Pode enviar mais de uma, até 6 por pessoa.';
+  $('btn-enviar').textContent = 'Enviar sugestão';
+  $('btn-cancelar').hidden = true;
+  mostrarFoto(null);
+}
+
+function mostrarFoto(src) {
+  const img = $('foto-previa');
+  img.hidden = !src;
+  if (src) img.src = src; else img.removeAttribute('src');
+  $('foto-rotulo').textContent = src ? 'Trocar foto' : 'Escolher foto';
+  $('foto-remover').hidden = !src;
+}
+
+function editar(p) {
+  E.editando = p; E.foto = null; E.removerFoto = false;
+  $('f-nome').value = p.nome; $('f-nome').disabled = true;
+  $('f-presente').value = p.presente;
+  $('f-link').value = p.link;
+  $('f-detalhes').value = p.detalhes;
+  $('f-foto').value = '';
+  mostrarFoto(p.imagem || null);
+  $('form-titulo').textContent = 'Editando sugestão';
+  $('form-dica').textContent = 'Altere o que quiser e salve.';
+  $('btn-enviar').textContent = 'Salvar alterações';
+  $('btn-cancelar').hidden = false;
+  mensagem('');
+  $('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('f-presente').focus({ preventScroll: true });
+}
+
+async function apagar(p) {
+  if (!confirm('Apagar a sugestão “' + p.presente + '”?')) return;
+  try {
+    await api({ acao: 'apagar', id: p.id, chave: minhasChaves()[p.id] });
+    esquecerChave(p.id);
+    if (E.editando && E.editando.id === p.id) limparForm();
+    mensagem('Sugestão apagada.', 'ok');
+    await carregar(true);
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+// reduz a foto no próprio aparelho (rápido de enviar e leve para o mural)
+function prepararFoto(arquivo) {
+  return new Promise((ok, falha) => {
+    if (!/^image\//.test(arquivo.type)) { falha(new Error('Escolha um arquivo de imagem.')); return; }
+    const url = URL.createObjectURL(arquivo);
+    const img = new Image();
+    img.onload = () => {
+      const esc = Math.min(1, LADO_MAX_FOTO / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * esc), h = Math.round(img.naturalHeight * esc);
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);   // PNG transparente → fundo branco
+      ctx.drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      const dataUrl = cv.toDataURL('image/jpeg', QUALIDADE_FOTO);
+      ok({ dataUrl: dataUrl, base64: dataUrl.split(',')[1], tipo: 'image/jpeg' });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); falha(new Error('Não consegui ler esta imagem. Tente outra (JPG ou PNG).')); };
+    img.src = url;
+  });
+}
+
+async function enviar(ev) {
+  ev.preventDefault();
+  if (E.enviando) return;
+  const nome = $('f-nome').value;
+  const presente = $('f-presente').value.trim();
+  let link = $('f-link').value.trim();
+  if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+  if (!nome) { mensagem('Escolha seu nome na lista.', 'erro'); $('f-nome').focus(); return; }
+  if (!presente) { mensagem('Diga o que você gostaria de ganhar.', 'erro'); $('f-presente').focus(); return; }
+
+  const dados = {
+    presente: presente, link: link, detalhes: $('f-detalhes').value.trim(),
+    imagem: E.foto ? { base64: E.foto.base64, tipo: E.foto.tipo } : null,
+  };
+  if (E.editando) {
+    Object.assign(dados, { acao: 'editar', id: E.editando.id, chave: minhasChaves()[E.editando.id],
+                           removerImagem: E.removerFoto && !E.foto });
+  } else {
+    Object.assign(dados, { acao: 'criar', nome: nome });
+  }
+
+  E.enviando = true;
+  const btn = $('btn-enviar');
+  const rotulo = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  mensagem('');
+  try {
+    const r = await api(dados);
+    if (dados.acao === 'criar') { guardarChave(r.id, r.chave); gravarLocal(ULTIMO_NOME, nome); }
+    const editou = !!E.editando;
+    limparForm();
+    $('f-nome').value = nome;
+    mensagem(editou ? 'Sugestão atualizada! ✨' : 'Sugestão enviada! 🎉 Quer mandar outra?', 'ok');
+    await carregar(true);
+  } catch (e) {
+    mensagem(e.message, 'erro');
+  } finally {
+    E.enviando = false; btn.disabled = false;
+    if (btn.textContent === 'Enviando…') btn.textContent = rotulo;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Mural
+// ══════════════════════════════════════════════════════════════
+const normalizar = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+function el(tag, attrs, filhos) {
+  const n = document.createElement(tag);
+  Object.entries(attrs || {}).forEach(([k, v]) => {
+    if (k === 'text') n.textContent = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (v !== null && v !== undefined && v !== false) n.setAttribute(k, v === true ? '' : v);
+  });
+  (filhos || []).forEach((f) => f && n.append(f));
+  return n;
+}
+
+function vazio(icone, texto) {
+  return el('div', { class: 'vazio' }, [el('div', { style: 'font-size:40px', text: icone }), el('p', { text: texto })]);
+}
+
+function mural(...nos) { const m = $('mural'); m.textContent = ''; m.append(...nos); }
+
+function cartaoPresente(p, minhas) {
+  const meu = !!minhas[p.id];
+  const imagem = p.imagem
+    ? el('img', { src: p.imagem, alt: p.presente, loading: 'lazy', referrerpolicy: 'no-referrer',
+                  onerror: (ev) => { ev.target.replaceWith(document.createTextNode('🎁')); } })
+    : document.createTextNode('🎁');
+  const rodape = el('div', { class: 'rodape' }, [
+    /^https?:\/\//i.test(p.link)
+      ? el('a', { class: 'abrir', href: p.link, target: '_blank', rel: 'noopener noreferrer nofollow', text: 'Ver na loja ↗' })
+      : null,
+    meu ? el('button', { type: 'button', class: 'link', text: 'Editar', onclick: () => editar(p) }) : null,
+    meu ? el('button', { type: 'button', class: 'link perigo', text: 'Apagar', onclick: () => apagar(p) }) : null,
+  ]);
+  return el('article', { class: 'presente' + (meu ? ' meu' : '') }, [
+    el('div', { class: 'img' }, [imagem]),
+    el('div', { class: 'corpo' }, [
+      meu ? el('span', { class: 'selo-meu', text: '★ Sua sugestão' }) : null,
+      el('h4', { text: p.presente }),
+      p.detalhes ? el('p', { text: p.detalhes }) : null,
+      rodape,
+    ]),
+  ]);
+}
+
+function render() {
+  // progresso
+  const comPedido = new Set(E.pedidos.map((p) => p.nome));
+  const enviaram = E.participantes.filter((n) => comPedido.has(n));
+  const faltam = E.participantes.filter((n) => !comPedido.has(n));
+  $('progresso').hidden = !E.participantes.length;
+  $('qtd-enviaram').textContent = enviaram.length;
+  $('qtd-total').textContent = E.participantes.length;
+  $('qtd-pedidos').textContent = E.pedidos.length + (E.pedidos.length === 1 ? ' sugestão' : ' sugestões');
+  $('barra').style.width = (E.participantes.length ? 100 * enviaram.length / E.participantes.length : 0) + '%';
+  $('faltam').hidden = !faltam.length;
+  $('qtd-faltam').textContent = faltam.length;
+  $('faltam-lista').replaceChildren(...faltam.map((n) => el('span', { class: 'chip', text: n })));
+
+  // filtros
+  const termo = normalizar($('busca').value.trim());
+  const pessoa = $('filtro-pessoa').value;
+  const minhas = minhasChaves();
+  const lista = E.pedidos.filter((p) =>
+    (!pessoa || p.nome === pessoa) &&
+    (!termo || normalizar(p.nome + ' ' + p.presente + ' ' + p.detalhes).indexOf(termo) >= 0));
+
+  if (!E.pedidos.length) { mural(vazio('🎄', 'Ninguém enviou sugestões ainda. Seja a primeira pessoa!')); return; }
+  if (!lista.length) { mural(vazio('🔍', 'Nenhuma sugestão encontrada com esse filtro.')); return; }
+
+  // agrupa por pessoa, na ordem da lista de participantes
+  const grupos = new Map();
+  lista.forEach((p) => { if (!grupos.has(p.nome)) grupos.set(p.nome, []); grupos.get(p.nome).push(p); });
+  const ordem = [...grupos.keys()].sort((a, b) => {
+    const ia = E.participantes.indexOf(a), ib = E.participantes.indexOf(b);
+    return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib) || a.localeCompare(b, 'pt-BR');
+  });
+  mural(...ordem.map((nome) => {
+    const ps = grupos.get(nome).sort((a, b) => String(a.criadoEm).localeCompare(String(b.criadoEm)));
+    return el('section', { class: 'pessoa' }, [
+      el('h3', {}, [document.createTextNode(nome), el('small', { text: ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') })]),
+      el('div', { class: 'grade' }, ps.map((p) => cartaoPresente(p, minhas))),
+    ]);
+  }));
+}
+
+// ══════════════════════════════════════════════════════════════
+// Eventos
+// ══════════════════════════════════════════════════════════════
+$('form').addEventListener('submit', enviar);
+$('btn-cancelar').addEventListener('click', () => { limparForm(); mensagem(''); });
+$('btn-atualizar').addEventListener('click', () => carregar(false));
+$('f-nome').addEventListener('change', (ev) => gravarLocal(ULTIMO_NOME, ev.target.value));
+
+$('f-foto').addEventListener('change', async (ev) => {
+  const arq = ev.target.files && ev.target.files[0];
+  if (!arq) return;
+  try {
+    E.foto = await prepararFoto(arq);
+    E.removerFoto = false;
+    mostrarFoto(E.foto.dataUrl);
+    mensagem('');
+  } catch (e) {
+    mensagem(e.message, 'erro');
+  }
+  ev.target.value = '';
+});
+$('foto-remover').addEventListener('click', () => { E.foto = null; E.removerFoto = true; mostrarFoto(null); });
+
+let espera;
+$('busca').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(render, 200); });
+$('filtro-pessoa').addEventListener('change', render);
+
+$('btn-tema').addEventListener('click', () => {
+  const root = document.documentElement;
+  const atual = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const novo = atual === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', novo);
+  gravarLocal('amigo-secreto-2026:tema', novo);
+});
+(function () { const t = lerLocal('amigo-secreto-2026:tema', null); if (t) document.documentElement.setAttribute('data-theme', t); })();
+
+// atualiza o mural sozinho a cada 2 min (sem atrapalhar quem está digitando)
+setInterval(() => { if (!document.hidden && !E.enviando) carregar(true); }, 120000);
+
+carregar(false);
+</script>
+</body>
+</html>
