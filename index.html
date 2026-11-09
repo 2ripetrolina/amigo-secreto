@@ -236,6 +236,13 @@
   .campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
   .campo label, .campo .rot { font: 700 11px/1.2 var(--texto); letter-spacing: .06em; text-transform: uppercase; color: var(--azul); }
   .campo .opcional { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--aco); }
+  .link-status { margin: 2px 0 0; font: 500 12.5px/1.4 var(--texto); color: var(--ardosia); }
+  .link-status.ok { color: var(--verde); }
+  .link-status.buscando::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 7px; vertical-align: -1px;
+                                  border: 2px solid var(--celeste); border-right-color: transparent; border-radius: 50%; animation: girar .8s linear infinite; }
+  @keyframes girar { to { transform: rotate(360deg); } }
+  .foto .selo-loja { position: absolute; left: 8px; bottom: 8px; z-index: 1; font: 700 10.5px/1 var(--texto); letter-spacing: .04em;
+                     background: var(--navy); color: var(--branco); border-radius: 4px; padding: 5px 7px; }
   input[type="text"], input[type="url"], input[type="search"], select, textarea {
     font: 500 16px/1.4 var(--texto); color: var(--navy); width: 100%;
     background: transparent; border: 0; border-bottom: 1.5px solid #cdc2b4; border-radius: 0; padding: 8px 2px;
@@ -520,7 +527,8 @@
         </div>
         <div class="campo">
           <label for="f-link">Link da loja <span class="opcional">(opcional)</span></label>
-          <input type="url" id="f-link" inputmode="url" placeholder="https://…">
+          <input type="url" id="f-link" inputmode="url" placeholder="Cole o link: nome e foto vêm sozinhos ✨">
+          <p class="link-status" id="link-status" role="status" hidden></p>
         </div>
         <div class="campo">
           <label for="f-detalhes">Detalhes <span class="opcional">(opcional)</span></label>
@@ -545,6 +553,7 @@
           <div class="campo" style="margin-bottom:0"><span class="rot">Foto <span class="opcional">(opcional)</span></span></div>
           <label class="foto" id="foto" for="f-foto">
             <img id="foto-previa" alt="Prévia da foto escolhida" hidden>
+            <span class="selo-loja" id="foto-loja" hidden>Foto da loja</span>
             <span class="vazia" id="foto-vazia">📷 Toque para escolher uma foto<b id="foto-rotulo">Escolher foto</b></span>
             <input type="file" id="f-foto" accept="image/*" aria-label="Foto do presente">
           </label>
@@ -628,7 +637,10 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const CODIGO = 'amigo-secreto-2026:codigo';
 
 const E = { participantes: [], pedidos: [], editando: null, foto: null, removerFoto: false, enviando: false,
-            codigo: '', liberado: false };
+            codigo: '', liberado: false,
+            fotoLoja: null,        // endereço da foto achada pelo link da loja (o servidor guarda uma cópia)
+            presenteAuto: '',      // nome preenchido automaticamente (só sobrescreve se a pessoa não mexeu)
+            linkBuscado: '' };
 const $ = (id) => document.getElementById(id);
 
 // ── armazenamento local (pode estar indisponível) ──────────────
@@ -754,6 +766,7 @@ function mensagem(texto, tipo) {
 
 function limparForm() {
   E.editando = null; E.foto = null; E.removerFoto = false;
+  E.fotoLoja = null; E.presenteAuto = ''; E.linkBuscado = ''; statusLink('');
   $('f-presente').value = ''; $('f-link').value = ''; $('f-detalhes').value = '';
   $('f-foto').value = '';
   $('f-nome').disabled = false;
@@ -764,17 +777,56 @@ function limparForm() {
   mostrarFoto(null);
 }
 
-function mostrarFoto(src) {
+function mostrarFoto(src, daLoja) {
   const img = $('foto-previa');
   img.hidden = !src;
   if (src) img.src = src; else img.removeAttribute('src');
   $('foto-vazia').hidden = !!src;
   $('foto-rotulo').textContent = src ? 'Trocar foto' : 'Escolher foto';
   $('foto-remover').hidden = !src;
+  $('foto-loja').hidden = !(src && daLoja);
+}
+
+// ── prévia pelo link da loja ───────────────────────────────────
+function statusLink(texto, tipo) {
+  const s = $('link-status');
+  s.textContent = texto || '';
+  s.className = 'link-status ' + (tipo || '');
+  s.hidden = !texto;
+}
+
+async function buscarPrevia() {
+  let link = $('f-link').value.trim();
+  if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+  if (!/^https?:\/\/[^\s\/]+\.[^\s]{2,}/i.test(link)) { if (!link) statusLink(''); return; }
+  if (link === E.linkBuscado) return;
+  E.linkBuscado = link;
+  statusLink('Buscando o produto na loja…', 'buscando');
+  let p;
+  try {
+    const r = await fetch(API + '?acao=previa&codigo=' + encodeURIComponent(E.codigo || '') + '&url=' + encodeURIComponent(link));
+    p = await r.json();
+  } catch (e) { p = null; }
+  if (link !== E.linkBuscado) return;                 // a pessoa já trocou o link
+  if (!p || !p.ok || (!p.titulo && !p.imagem)) {
+    statusLink('Não consegui ler esse link. Escreva o nome do presente e, se quiser, escolha uma foto.');
+    return;
+  }
+  const campo = $('f-presente');
+  const preencheuNome = p.titulo && (!campo.value.trim() || campo.value === E.presenteAuto);
+  if (preencheuNome) { campo.value = p.titulo; E.presenteAuto = p.titulo; }
+  // foto da loja só entra se a pessoa não escolheu uma (nem há uma salva na edição)
+  const temFotoPropria = E.foto || (E.editando && E.editando.imagem && !E.removerFoto && !E.fotoLoja);
+  const usouFoto = p.imagem && !temFotoPropria;
+  if (usouFoto) { E.fotoLoja = p.imagem; mostrarFoto(p.imagem, true); }
+  const partes = [preencheuNome && 'nome', usouFoto && 'foto'].filter(Boolean);
+  statusLink(partes.length ? '✓ Pegamos ' + partes.join(' e ') + ' da loja. Confira e ajuste se precisar.'
+                           : '✓ Link conferido.', 'ok');
 }
 
 function editar(p) {
   E.editando = p; E.foto = null; E.removerFoto = false;
+  E.fotoLoja = null; E.presenteAuto = ''; E.linkBuscado = String(p.link || ''); statusLink('');
   $('f-nome').value = p.nome; $('f-nome').disabled = true;
   $('f-presente').value = p.presente;
   $('f-link').value = p.link;
@@ -839,6 +891,7 @@ async function enviar(ev) {
   const dados = {
     presente: presente, link: link, detalhes: $('f-detalhes').value.trim(),
     imagem: E.foto ? { base64: E.foto.base64, tipo: E.foto.tipo } : null,
+    imagemLoja: !E.foto && E.fotoLoja ? E.fotoLoja : null,
   };
   if (E.editando) {
     Object.assign(dados, { acao: 'editar', id: E.editando.id, chave: minhasChaves()[E.editando.id],
@@ -1007,7 +1060,7 @@ $('f-foto').addEventListener('change', async (ev) => {
   if (!arq) return;
   try {
     E.foto = await prepararFoto(arq);
-    E.removerFoto = false;
+    E.removerFoto = false; E.fotoLoja = null;
     mostrarFoto(E.foto.dataUrl);
     mensagem('');
   } catch (e) {
@@ -1015,7 +1068,17 @@ $('f-foto').addEventListener('change', async (ev) => {
   }
   ev.target.value = '';
 });
-$('foto-remover').addEventListener('click', () => { E.foto = null; E.removerFoto = true; mostrarFoto(null); });
+$('foto-remover').addEventListener('click', () => { E.foto = null; E.fotoLoja = null; E.removerFoto = true; mostrarFoto(null); });
+
+// colou/digitou o link → busca nome e foto (com uma pausa para não buscar a cada tecla)
+let esperaLink;
+$('f-link').addEventListener('input', () => { clearTimeout(esperaLink); esperaLink = setTimeout(buscarPrevia, 700); });
+$('f-link').addEventListener('paste', () => { clearTimeout(esperaLink); esperaLink = setTimeout(buscarPrevia, 50); });
+$('f-link').addEventListener('blur', () => { clearTimeout(esperaLink); buscarPrevia(); });
+// foto da loja que não carrega (link quebrado/bloqueado): descarta
+$('foto-previa').addEventListener('error', () => {
+  if (E.fotoLoja) { E.fotoLoja = null; mostrarFoto(null); statusLink('A foto da loja não abriu. Escolha uma foto se quiser.'); }
+});
 
 let espera;
 $('busca').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(render, 200); });
