@@ -364,6 +364,18 @@
   .selo-meu { font: 700 10px var(--texto); letter-spacing: .08em; text-transform: uppercase; color: #b45309; }
   .selo-rodape { margin-top: auto; padding-top: 8px; display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; border-top: 1px dashed var(--linha); }
   .ver-loja { font: 700 13px var(--texto); color: var(--celeste); text-decoration: none; }
+  /* ordem de preferência */
+  .selo-rank { position: absolute; top: 6px; left: 6px; z-index: 1; font: 800 10.5px/1 var(--texto); letter-spacing: .05em; text-transform: uppercase;
+               padding: 5px 8px; border-radius: 99px; color: var(--navy); background: var(--branco); box-shadow: 0 1px 3px rgba(0, 25, 65, .3); }
+  .selo-rank.r1 { background: var(--amarelo); }
+  .selo-rank.r2 { background: #e4e8ef; }
+  .selo-rank.r3 { background: #f3c49d; }
+  .ordem-btns { margin-left: auto; display: inline-flex; gap: 4px; }
+  .seta { width: 30px; height: 28px; border-radius: 6px; border: 1.5px solid var(--linha); background: var(--branco); color: var(--navy);
+          font-size: 11px; cursor: pointer; display: grid; place-items: center; }
+  .seta:hover:not(:disabled) { border-color: var(--celeste); color: var(--celeste); }
+  .seta:disabled { opacity: .35; cursor: default; }
+  .dica-ordem { margin: -8px 0 14px; font-size: 13.5px; opacity: .95; }
   .ver-loja::after { content: " ▸"; font-size: 10px; }
 
   .aviso { text-align: center; padding: 40px 16px; color: var(--branco); }
@@ -965,7 +977,7 @@ async function enviar(ev) {
     const editou = !!E.editando;
     limparForm();
     $('f-nome').value = nome;
-    mensagem(editou ? 'Sugestão atualizada! ✨' : 'Sugestão enviada! 🎉 Quer mandar outra?', 'ok');
+    mensagem(editou ? 'Sugestão atualizada! ✨' : 'Sugestão enviada! 🎉 Quer mandar outra? Depois, use ◀ ▶ nos seus cards para definir a ordem de preferência.', 'ok');
     await carregar(true);
   } catch (e) {
     mensagem(e.message, 'erro');
@@ -1027,7 +1039,28 @@ function aviso(icone, texto) {
 
 function mural(...nos) { const m = $('mural'); m.textContent = ''; m.append(...nos); }
 
-function cartaoPresente(p, minhas) {
+// sugestões da pessoa na ordem de preferência (sem ordem definida → pela data de envio)
+function emOrdem(lista) {
+  return lista.slice().sort((a, b) => ((a.ordem || 1e9) - (b.ordem || 1e9)) || String(a.criadoEm).localeCompare(String(b.criadoEm)));
+}
+function daPessoa(nome) { return emOrdem(E.pedidos.filter((p) => p.nome === nome)); }
+
+// move uma sugestão uma posição para antes (-1) ou depois (+1)
+let filaOrdem = Promise.resolve();
+function mover(p, delta) {
+  const lista = daPessoa(p.nome);
+  const i = lista.findIndex((x) => x.id === p.id), j = i + delta;
+  if (i < 0 || j < 0 || j >= lista.length) return;
+  [lista[i], lista[j]] = [lista[j], lista[i]];
+  lista.forEach((x, k) => { x.ordem = k + 1; });          // muda na tela na hora
+  render();
+  const c = minhasChaves();
+  const itens = lista.filter((x) => c[x.id]).map((x) => ({ id: x.id, chave: c[x.id] }));
+  filaOrdem = filaOrdem.then(() => api({ acao: 'reordenar', itens: itens }))
+    .catch((e) => { alert(e.message); return carregar(true); });
+}
+
+function cartaoPresente(p, minhas, posicao, total, podeOrdenar) {
   const meu = !!minhas[p.id];
   const imagem = p.imagem
     ? el('img', { src: p.imagem, alt: p.presente, loading: 'lazy', referrerpolicy: 'no-referrer',
@@ -1039,11 +1072,20 @@ function cartaoPresente(p, minhas) {
       : null,
     meu ? el('button', { type: 'button', class: 'link-btn', text: 'Editar', onclick: () => editar(p) }) : null,
     meu ? el('button', { type: 'button', class: 'link-btn perigo', text: 'Apagar', onclick: () => apagar(p) }) : null,
+    podeOrdenar ? el('span', { class: 'ordem-btns' }, [
+      el('button', { type: 'button', class: 'seta', text: '◀', title: 'Mais preferida', 'aria-label': 'Mover “' + p.presente + '” para antes',
+                     disabled: posicao === 1, onclick: () => mover(p, -1) }),
+      el('button', { type: 'button', class: 'seta', text: '▶', title: 'Menos preferida', 'aria-label': 'Mover “' + p.presente + '” para depois',
+                     disabled: posicao === total, onclick: () => mover(p, +1) }),
+    ]) : null,
   ]);
+  const medalha = total > 1
+    ? el('span', { class: 'selo-rank r' + Math.min(posicao, 4), text: posicao + 'ª opção' })
+    : null;
   return el('article', { class: 'selo' + (meu ? ' meu' : '') }, [
     el('div', { class: 'selo-papel' }, [el('div', { class: 'selo-miolo' }, [
       el('div', { class: 'selo-topo' }, [
-        el('div', { class: 'selo-img' }, [imagem, el('span', { class: 'valor-selo', text: '2026' })]),
+        el('div', { class: 'selo-img' }, [imagem, medalha, el('span', { class: 'valor-selo', text: '2026' })]),
         carimbo(p.criadoEm),
       ]),
       el('div', { class: 'selo-corpo' }, [
@@ -1107,11 +1149,15 @@ function render() {
     return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib) || a.localeCompare(b, 'pt-BR');
   });
   mural(...ordem.map((nome) => {
-    const ps = grupos.get(nome).sort((a, b) => String(a.criadoEm).localeCompare(String(b.criadoEm)));
+    const ps = emOrdem(grupos.get(nome));
+    const todas = daPessoa(nome);                                   // posição considera todas, mesmo com filtro
+    const podeOrdenar = todas.length > 1 && todas.every((x) => minhas[x.id]);
     return el('section', { class: 'pessoa', id: 'pessoa-' + normalizar(nome).replace(/[^a-z0-9]+/g, '-') }, [
       el('h3', { class: 'display' }, [document.createTextNode(nome),
-        el('small', { text: ps.length ? ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') : '' })]),
-      ps.length ? el('div', { class: 'grade' }, ps.map((p) => cartaoPresente(p, minhas)))
+        el('small', { text: ps.length ? ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') + (todas.length > 1 ? ' · em ordem de preferência' : '') : '' })]),
+      podeOrdenar ? el('p', { class: 'dica-ordem', text: 'Use ◀ ▶ nos seus cards para definir a ordem: a 1ª opção é a que você mais quer.' }) : null,
+      ps.length ? el('div', { class: 'grade' }, ps.map((p) =>
+                    cartaoPresente(p, minhas, todas.findIndex((x) => x.id === p.id) + 1, todas.length, podeOrdenar)))
                 : el('p', { class: 'sem-sugestao', text: 'Ainda não mandou sugestões. Para responder às perguntas, envie uma sugestão primeiro.' }),
       blocoPerguntas(nome, meus.has(nome)),
     ]);
