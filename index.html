@@ -96,6 +96,7 @@
   /* data do evento + contagem regressiva */
   .evento { margin: 30px auto 0; }
   .evento-data { margin: 0; font: 700 clamp(14px, 1.8vw, 17px)/1.4 var(--texto); }
+  .evento-local { margin: 6px 0 0; font: 500 clamp(13px, 1.6vw, 15px)/1.4 var(--texto); opacity: .92; }
   .evento-rotulo { display: inline-block; font: 700 10px/1 var(--texto); letter-spacing: .08em; text-transform: uppercase;
                    background: var(--amarelo); color: var(--navy); border-radius: 4px; padding: 5px 7px; margin-right: 10px; vertical-align: 2px; }
   .contagem { display: flex; justify-content: center; gap: clamp(8px, 2vw, 14px); margin-top: 16px; }
@@ -170,7 +171,7 @@
     aspect-ratio: 4 / 3; background: var(--papel); border: 1.5px dashed #cdc2b4; border-radius: 4px; overflow: hidden;
   }
   .foto input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; background: var(--branco); }
   .foto .vazia { color: var(--ardosia); font-size: 14px; padding: 12px; }
   .foto .vazia b { display: block; font-family: var(--display); font-size: 12px; color: var(--azul); margin-top: 6px; font-weight: 400; }
   .foto-acoes { display: flex; justify-content: space-between; align-items: center; margin-top: -8px; }
@@ -234,7 +235,9 @@
     position: relative; aspect-ratio: 4 / 3; overflow: hidden; display: grid; place-items: center;
     background: var(--ceu); box-shadow: inset 0 0 0 1px rgba(0, 25, 65, .15);
   }
-  .selo-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .selo-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; }
+  .selo-img:has(img) { background: var(--branco); }   /* foto inteira, sem cortar, sobre fundo branco */
+  .selo-img:has(img) .valor-selo { color: var(--navy); text-shadow: none; background: rgba(255,255,255,.85); padding: 1px 5px; border-radius: 3px; z-index: 1; }
   .selo-img .presente-svg { width: 46%; }
   .selo-img .valor-selo { position: absolute; top: 6px; right: 8px; font-family: var(--display); font-size: 10px; color: var(--branco); text-shadow: 0 1px 4px rgba(0, 25, 65, .5); }
   .selo-carimbo { position: absolute; width: 96px; right: -10px; bottom: -26px; color: var(--azul); opacity: .8; transform: rotate(-10deg); pointer-events: none; }
@@ -307,6 +310,7 @@
 
     <div class="evento">
       <p class="evento-data"><span class="evento-rotulo">A troca</span>Sábado, 5 de dezembro · a partir das 17:00</p>
+      <p class="evento-local">📍 Casa Brasilis Eventos · Confraternização 2RI 2026 Sunset</p>
       <div class="contagem" id="contagem" aria-hidden="true">
         <div><b id="cd-dias">--</b><span>dias</span></div>
         <div><b id="cd-horas">--</b><span>horas</span></div>
