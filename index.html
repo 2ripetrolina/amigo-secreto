@@ -6,209 +6,420 @@
 <title>Amigo Secreto 2026</title>
 <meta name="description" content="Lista de desejos do amigo secreto: cada pessoa sugere o que gostaria de ganhar.">
 <meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#005fe2">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Stack+Sans+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #fbf7f2;
-    --superficie: #ffffff;
-    --superficie-2: #f4eee6;
-    --texto: #2a2420;
-    --texto-sec: #6f655d;
-    --borda: #e6ddd2;
-    --vermelho: #b3261e;
-    --vermelho-suave: #f9e3e1;
-    --verde: #1e6b47;
-    --verde-suave: #dff0e6;
-    --dourado: #b7862f;
-    --foco: #1e6b47;
-    --botao: #b3261e;
-    --sombra: 0 1px 2px rgba(42, 36, 32, .06), 0 4px 16px rgba(42, 36, 32, .06);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #171412; --superficie: #211d1a; --superficie-2: #2a2521; --texto: #f1ebe4;
-      --texto-sec: #b3a89d; --borda: #3a332d; --vermelho: #ff8a80; --vermelho-suave: #3b2220;
-      --verde: #7fd1a6; --verde-suave: #1d3328; --dourado: #e2b866; --foco: #7fd1a6; --botao: #b8443b;
-      --sombra: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #171412; --superficie: #211d1a; --superficie-2: #2a2521; --texto: #f1ebe4;
-    --texto-sec: #b3a89d; --borda: #3a332d; --vermelho: #ff8a80; --vermelho-suave: #3b2220;
-    --verde: #7fd1a6; --verde-suave: #1d3328; --dourado: #e2b866; --foco: #7fd1a6; --botao: #b8443b;
-    --sombra: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+    --navy: #001941;
+    --azul: #023a97;
+    --celeste: #005fe2;
+    --rosa: #ea97df;
+    --creme: #faf7f2;
+    --areia: #fbebd7;
+    --papel: #f3ece2;
+    --linha: #e2d8cb;
+    --laranja: #fe6e25;
+    --amarelo: #fed261;
+    --verde: #42874c;
+    --ardosia: #525c6c;
+    --aco: #777e89;
+    --branco: #ffffff;
+    --display: "Boldonse", Impact, "Arial Black", sans-serif;
+    --texto: "Stack Sans Text", Arial, sans-serif;
+    --ceu: linear-gradient(180deg, #005fe2 0%, #4f72e6 28%, #9a8ae6 55%, #ea97df 82%, #f4b8c8 100%);
   }
 
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0; background: var(--bg); color: var(--texto);
-    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  }
-  .pagina { max-width: 1240px; margin: 0 auto; padding: 0 16px 64px; }
-  a { color: var(--verde); }
-  :focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; border-radius: 4px; }
-
-  header.topo { padding: 36px 0 20px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; }
-  .marca { display: flex; gap: 14px; align-items: center; }
-  .marca .laco { font-size: 44px; line-height: 1; }
-  h1 { font: 700 clamp(28px, 5vw, 40px)/1.1 Fraunces, Georgia, serif; margin: 0; letter-spacing: -.01em; }
-  .subtitulo { margin: 4px 0 0; color: var(--texto-sec); }
-  .acoes-topo { display: flex; gap: 8px; }
-
-  .progresso { background: var(--superficie); border: 1px solid var(--borda); border-radius: 14px; padding: 14px 16px; box-shadow: var(--sombra); }
-  .progresso-linha { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 15px; }
-  .barra { height: 8px; background: var(--superficie-2); border-radius: 99px; margin: 10px 0 4px; overflow: hidden; }
-  .barra > span { display: block; height: 100%; background: linear-gradient(90deg, var(--verde), var(--dourado)); border-radius: 99px; transition: width .4s; }
-  details.faltam summary { cursor: pointer; color: var(--texto-sec); font-size: 14px; margin-top: 6px; }
-  .faltam-lista { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .chip { font-size: 13px; padding: 3px 10px; border-radius: 99px; background: var(--superficie-2); color: var(--texto-sec); }
-
-  .layout { display: grid; grid-template-columns: 360px 1fr; gap: 24px; margin-top: 24px; align-items: start; }
-  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
-
-  .cartao { background: var(--superficie); border: 1px solid var(--borda); border-radius: 16px; padding: 20px; box-shadow: var(--sombra); }
-  .form { position: sticky; top: 16px; }
-  @media (max-width: 860px) { .form { position: static; } }
-  .form h2 { font: 600 22px/1.2 Fraunces, Georgia, serif; margin: 0 0 4px; }
-  .form .dica { color: var(--texto-sec); font-size: 14px; margin: 0 0 16px; }
-  .campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-  .campo label { font-weight: 600; font-size: 14px; }
-  .campo .opcional { font-weight: 400; color: var(--texto-sec); }
-  input[type="text"], input[type="url"], input[type="search"], select, textarea {
-    font: inherit; color: var(--texto); background: var(--bg); width: 100%;
-    border: 1px solid var(--borda); border-radius: 10px; padding: 10px 12px;
-  }
-  textarea { resize: vertical; min-height: 64px; }
-  select:disabled { opacity: .7; }
-
-  .foto { border: 1.5px dashed var(--borda); border-radius: 12px; padding: 12px; text-align: center; background: var(--bg); }
-  .foto input { display: none; }
-  .foto .escolher { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; color: var(--verde); font-weight: 600; }
-  .foto img { display: block; max-width: 100%; max-height: 200px; margin: 0 auto 10px; border-radius: 8px; }
-  .foto .remover { margin-left: 10px; }
-
-  button {
-    font: inherit; font-weight: 600; cursor: pointer; border-radius: 10px; padding: 10px 16px;
-    border: 1px solid transparent; background: var(--botao); color: #fff;
-  }
-  button.secundario { background: transparent; border-color: var(--borda); color: var(--texto); }
-  button.link { background: none; border: none; padding: 4px 6px; color: var(--texto-sec); font-weight: 500; }
-  button.link:hover { color: var(--texto); }
-  button.perigo { color: var(--vermelho); }
-  button:disabled { opacity: .55; cursor: progress; }
-  .botoes { display: flex; gap: 8px; flex-wrap: wrap; }
-  .botoes .primario { flex: 1; }
-
-  .msg { margin: 12px 0 0; font-size: 14px; padding: 10px 12px; border-radius: 10px; }
-  .msg.ok { background: var(--verde-suave); color: var(--verde); }
-  .msg.erro { background: var(--vermelho-suave); color: var(--vermelho); }
-
-  .ferramentas { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-  .ferramentas input { flex: 1 1 220px; }
-  .ferramentas select { flex: 0 1 240px; }
-
-  .pessoa { margin-bottom: 28px; }
-  .pessoa h3 { font: 600 20px/1.2 Fraunces, Georgia, serif; margin: 0 0 12px; display: flex; gap: 10px; align-items: baseline; }
-  .pessoa h3 small { font: 400 13px system-ui, sans-serif; color: var(--texto-sec); }
-  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
-  .presente { background: var(--superficie); border: 1px solid var(--borda); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--sombra); }
-  .presente.meu { border-color: var(--dourado); }
-  .presente .img { aspect-ratio: 4 / 3; background: var(--superficie-2); display: grid; place-items: center; font-size: 44px; overflow: hidden; }
-  .presente .img img { width: 100%; height: 100%; object-fit: cover; }
-  .presente .corpo { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-  .presente h4 { margin: 0; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; }
-  .presente p { margin: 0; color: var(--texto-sec); font-size: 14px; overflow-wrap: anywhere; white-space: pre-line; }
-  .presente .rodape { margin-top: auto; padding-top: 6px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
-  .presente .abrir { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; font-size: 14px; text-decoration: none; padding: 6px 10px; border-radius: 8px; background: var(--verde-suave); color: var(--verde); }
-  .selo-meu { font-size: 12px; color: var(--dourado); font-weight: 600; }
-
-  .vazio { text-align: center; color: var(--texto-sec); padding: 48px 16px; }
-  .carregando { text-align: center; color: var(--texto-sec); padding: 48px 16px; }
-  footer { margin-top: 40px; color: var(--texto-sec); font-size: 13px; text-align: center; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--branco); color: var(--navy); font: 16px/1.6 var(--texto); }
+  img { max-width: 100%; }
+  a { color: var(--celeste); }
+  :focus-visible { outline: 3px solid var(--laranja); outline-offset: 3px; border-radius: 4px; }
   [hidden] { display: none !important; }
+  .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+  .display { font-family: var(--display); text-transform: uppercase; font-weight: 400; letter-spacing: -.01em; }
+  .eyebrow { font-family: var(--display); text-transform: uppercase; font-size: 11px; letter-spacing: .02em; }
+  .eyebrow::before { content: "▪"; margin-right: 8px; }
+
+  /* ── botões ─────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+    font: 600 14px/1 var(--texto); text-decoration: none;
+    background: var(--navy); color: var(--branco); border: 1.5px solid var(--navy);
+    border-radius: 6px; padding: 13px 18px;
+    box-shadow: 0 2px 0 rgba(0, 25, 65, .25);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .btn::after { content: "▸"; font-size: 11px; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 0 rgba(0, 25, 65, .25); }
+  .btn.claro { background: var(--branco); color: var(--navy); }
+  .btn.sem-seta::after { content: none; }
+  .btn:disabled { opacity: .55; cursor: progress; transform: none; }
+  .link-btn { background: none; border: 0; padding: 4px 2px; cursor: pointer; font: 600 13px var(--texto); color: var(--celeste); }
+  .link-btn.perigo { color: #c2410c; }
+
+  /* ── barra do topo ──────────────────────────────────────────── */
+  .nav { background: var(--branco); border-bottom: 1px solid var(--linha); }
+  .nav .container { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 64px; }
+  .nav-marca { display: flex; align-items: center; gap: 18px; color: var(--navy); text-decoration: none; }
+  .nav-marca .display { font-size: 11px; line-height: 1.45; }
+  .nav-marca .sep { width: 1px; height: 28px; background: var(--linha); }
+  .nav-marca small { font-size: 13px; color: var(--ardosia); }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-links .btn { padding: 10px 14px; font-size: 13px; }
+  @media (max-width: 560px) { .nav-marca .sep, .nav-marca small { display: none; } .nav-links .btn.claro { display: none; } }
+
+  /* ── céu + nuvens ───────────────────────────────────────────── */
+  .ceu { position: relative; background: var(--ceu); color: var(--branco); overflow: hidden; }
+  .nuvens { position: absolute; left: 0; right: 0; bottom: -2px; height: 190px; pointer-events: none; }
+  .nuvem, .nuvem-alta { height: auto; aspect-ratio: 220 / 90; }
+  .nuvem { position: absolute; fill: var(--areia); }
+  .nuvem.rosa { fill: #f6c9de; opacity: .85; }
+  .nuvem.lilas { fill: #b9b2ee; opacity: .7; }
+
+  /* ── hero ───────────────────────────────────────────────────── */
+  .hero { text-align: center; padding: 72px 0 230px; }
+  .hero h1 { margin: 0; font-size: clamp(30px, 10.5vw, 128px); line-height: 1.24; }
+  .hero h1 .linha { display: block; white-space: nowrap; }
+  .hero h1 .emblema { display: inline-block; width: 1.1em; height: .9em; vertical-align: -.08em; margin: 0 .12em; }
+  .hero .lema { margin: 30px 0 0; font-size: clamp(13px, 2.6vw, 30px); line-height: 1.5; }
+  .hero .lema em { font-style: normal; color: var(--amarelo); }
+  .meta { display: flex; justify-content: center; gap: clamp(20px, 6vw, 64px); margin: 34px 0 30px; flex-wrap: wrap; }
+  .meta div { text-align: left; }
+  .meta .rotulo { font: 700 10px/1 var(--texto); letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  .meta .valor { font-family: var(--display); font-size: clamp(15px, 2vw, 20px); margin-top: 6px; line-height: 1.6; }
+  .voador { position: absolute; width: clamp(110px, 16vw, 210px); right: 7%; bottom: 70px; z-index: 2; animation: flutuar 5s ease-in-out infinite; }
+  @keyframes flutuar { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-14px) rotate(-2deg); } }
+  @media (prefers-reduced-motion: reduce) { .voador { animation: none; } html { scroll-behavior: auto; } }
+  @media (max-width: 700px) { .voador { right: 4%; bottom: 120px; } .hero { padding-bottom: 260px; } }
+
+  /* ── seção "como funciona" + postal ─────────────────────────── */
+  .secao { padding: 88px 0; }
+  .intro { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: start; }
+  @media (max-width: 860px) { .intro { grid-template-columns: 1fr; gap: 28px; } }
+  .titulo-grande { margin: 0; font-size: clamp(22px, 3.6vw, 46px); line-height: 1.5; }
+  .degrade { background: linear-gradient(90deg, var(--celeste), var(--rosa)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .intro p { margin: 0 0 18px; color: var(--ardosia); font-size: 17px; }
+  .intro p strong { color: var(--navy); }
+
+  .postal {
+    position: relative; margin-top: 56px; background: var(--creme); color: var(--navy);
+    border-radius: 6px; padding: 28px; display: grid; grid-template-columns: 1.15fr 1px .85fr; gap: 28px;
+    box-shadow: 0 1px 0 var(--linha), 0 18px 40px -18px rgba(0, 25, 65, .35), 0 0 0 1px var(--linha);
+  }
+  .postal::before {   /* segunda folha por trás, como no cartão de referência */
+    content: ""; position: absolute; inset: 10px -8px -10px 8px; background: var(--papel);
+    border-radius: 6px; z-index: -1; box-shadow: 0 0 0 1px var(--linha); transform: rotate(-1deg);
+  }
+  .postal .divisor { background: repeating-linear-gradient(180deg, var(--linha) 0 6px, transparent 6px 12px); }
+  @media (max-width: 860px) { .postal { grid-template-columns: 1fr; padding: 22px 18px; } .postal .divisor { display: none; } }
+  .postal h2 { margin: 0 0 4px; font-size: clamp(17px, 2.2vw, 22px); line-height: 1.5; }
+  .postal .dica { margin: 0 0 22px; color: var(--ardosia); font-size: 14px; }
+  .campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .campo label, .campo .rot { font: 700 11px/1.2 var(--texto); letter-spacing: .06em; text-transform: uppercase; color: var(--azul); }
+  .campo .opcional { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--aco); }
+  input[type="text"], input[type="url"], input[type="search"], select, textarea {
+    font: 500 16px/1.4 var(--texto); color: var(--navy); width: 100%;
+    background: transparent; border: 0; border-bottom: 1.5px solid #cdc2b4; border-radius: 0; padding: 8px 2px;
+  }
+  select { cursor: pointer; }
+  textarea { resize: vertical; min-height: 56px; }
+  input:focus, select:focus, textarea:focus { outline: none; border-bottom-color: var(--celeste); }
+  select:disabled { opacity: .7; }
+  ::placeholder { color: #a39a8e; }
+
+  .verso { display: flex; flex-direction: column; gap: 18px; }
+  .verso-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .foto {
+    position: relative; display: grid; place-items: center; text-align: center; cursor: pointer;
+    aspect-ratio: 4 / 3; background: var(--papel); border: 1.5px dashed #cdc2b4; border-radius: 4px; overflow: hidden;
+  }
+  .foto input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .foto .vazia { color: var(--ardosia); font-size: 14px; padding: 12px; }
+  .foto .vazia b { display: block; font-family: var(--display); font-size: 12px; color: var(--azul); margin-top: 6px; font-weight: 400; }
+  .foto-acoes { display: flex; justify-content: space-between; align-items: center; margin-top: -8px; }
+  .destinatario { border-top: 1px solid var(--linha); padding-top: 10px; font-size: 13px; color: var(--ardosia); }
+  .botoes { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .msg { margin: 0; font-size: 14px; padding: 10px 12px; border-radius: 6px; }
+  .msg.ok { background: #e3f1e5; color: #1f5a2a; }
+  .msg.erro { background: #ffe8dc; color: #9a3412; }
+
+  /* selo e carimbo (decorativos) */
+  .selo-mini {
+    width: 74px; padding: 4px; flex: none; transform: rotate(4deg);
+    background: radial-gradient(circle at 4px 4px, transparent 2.4px, var(--branco) 2.8px) -4px -4px / 8px 8px;
+    filter: drop-shadow(0 2px 3px rgba(0, 25, 65, .25));
+  }
+  .selo-mini svg { display: block; width: 100%; height: auto; }
+  .carimbo { width: 150px; height: auto; color: var(--celeste); flex: none; }
+
+  /* ── seção da lista (céu) ───────────────────────────────────── */
+  .lista { padding: 96px 0 230px; }
+  .lista .cabeca { text-align: center; margin-bottom: 36px; position: relative; z-index: 1; }
+  .lista .cabeca h2 { margin: 12px 0 0; font-size: clamp(22px, 4.6vw, 58px); line-height: 1.5; }
+  .aviao { position: absolute; width: 90px; left: 38%; top: 54px; opacity: .95; }
+  .nuvem-alta { position: absolute; fill: #c9c4f2; opacity: .55; }
+
+  .painel {
+    position: relative; z-index: 1; background: var(--creme); color: var(--navy); border-radius: 8px;
+    padding: 18px 20px; box-shadow: 0 0 0 1px var(--linha), 0 14px 30px -18px rgba(0, 25, 65, .45);
+  }
+  .progresso-linha { display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; font-size: 15px; }
+  .progresso-linha strong { font-family: var(--display); font-weight: 400; font-size: 14px; }
+  .barra { height: 10px; background: var(--papel); border-radius: 99px; margin: 12px 0 6px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--linha); }
+  .barra > span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--celeste), var(--rosa), var(--amarelo)); border-radius: 99px; transition: width .5s; }
+  details.faltam summary { cursor: pointer; color: var(--ardosia); font-size: 14px; margin-top: 6px; }
+  .faltam-lista { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { font: 600 12px var(--texto); padding: 4px 10px; border-radius: 99px; background: var(--branco); color: var(--ardosia); box-shadow: inset 0 0 0 1px var(--linha); }
+  .ferramentas { display: flex; gap: 14px 20px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--linha); }
+  .ferramentas input { flex: 1 1 220px; }
+  .ferramentas select { flex: 0 1 260px; }
+
+  #mural { position: relative; z-index: 1; margin-top: 44px; }
+  .pessoa { margin-bottom: 44px; }
+  .pessoa h3 { margin: 0 0 18px; font-size: clamp(15px, 1.9vw, 20px); line-height: 1.6; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; text-shadow: 0 1px 12px rgba(0, 25, 65, .25); }
+  .pessoa h3 small { font: 600 12px var(--texto); letter-spacing: .06em; text-transform: uppercase; opacity: .9; text-shadow: none; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 26px 22px; }
+
+  /* cartão de presente = selo postal */
+  .selo { filter: drop-shadow(0 10px 16px rgba(0, 25, 65, .28)); transition: transform .15s; }
+  .selo:nth-child(3n+1) { transform: rotate(-1.2deg); }
+  .selo:nth-child(3n+2) { transform: rotate(.8deg); }
+  .selo:hover { transform: rotate(0) translateY(-3px); }
+  .selo { --papel-selo: var(--creme); height: 100%; }
+  .selo.meu { --papel-selo: #fff6e0; }
+  .selo-papel {   /* 6px de borda pontilhada (os furos) em volta do miolo */
+    height: 100%; padding: 6px;
+    background: radial-gradient(circle at 6px 6px, transparent 3.4px, var(--papel-selo) 3.9px) -6px -6px / 12px 12px;
+  }
+  .selo-miolo { position: relative; height: 100%; background: var(--papel-selo); color: var(--navy); padding: 8px; display: flex; flex-direction: column; }
+  .selo-topo { position: relative; }
+  .selo-img {
+    position: relative; aspect-ratio: 4 / 3; overflow: hidden; display: grid; place-items: center;
+    background: var(--ceu); box-shadow: inset 0 0 0 1px rgba(0, 25, 65, .15);
+  }
+  .selo-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .selo-img .presente-svg { width: 46%; }
+  .selo-img .valor-selo { position: absolute; top: 6px; right: 8px; font-family: var(--display); font-size: 10px; color: var(--branco); text-shadow: 0 1px 4px rgba(0, 25, 65, .5); }
+  .selo-carimbo { position: absolute; width: 96px; right: -10px; bottom: -26px; color: var(--azul); opacity: .8; transform: rotate(-10deg); pointer-events: none; }
+  .selo-corpo { padding: 14px 4px 2px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .selo-corpo h4 { margin: 0; font: 700 16px/1.3 var(--texto); overflow-wrap: anywhere; padding-right: 54px; }
+  .selo-corpo p { margin: 0; color: var(--ardosia); font-size: 14px; overflow-wrap: anywhere; white-space: pre-line; }
+  .selo-meu { font: 700 10px var(--texto); letter-spacing: .08em; text-transform: uppercase; color: #b45309; }
+  .selo-rodape { margin-top: auto; padding-top: 8px; display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; border-top: 1px dashed var(--linha); }
+  .ver-loja { font: 700 13px var(--texto); color: var(--celeste); text-decoration: none; }
+  .ver-loja::after { content: " ▸"; font-size: 10px; }
+
+  .aviso { text-align: center; padding: 40px 16px; color: var(--branco); }
+  .aviso .icone { font-size: 44px; }
+  .aviso p { font-family: var(--display); font-size: clamp(13px, 1.8vw, 16px); margin: 10px 0 0; line-height: 1.7; }
+
+  /* ── rodapé ─────────────────────────────────────────────────── */
+  .rodape { background: var(--areia); padding: 56px 0 64px; text-align: center; color: var(--ardosia); }
+  .rodape .display { color: var(--navy); font-size: clamp(16px, 2.6vw, 24px); margin: 0 0 12px; line-height: 1.5; }
+  .rodape p { margin: 0 auto 20px; max-width: 560px; font-size: 15px; }
 </style>
 </head>
 <body>
-<div class="pagina">
-  <header class="topo">
-    <div class="marca">
-      <span class="laco" aria-hidden="true">🎁</span>
+
+<!-- ilustrações reutilizadas -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-nuvem" viewBox="0 0 220 90"><path d="M18 90a18 18 0 0 1 2-36 30 30 0 0 1 44-22 42 42 0 0 1 78-6 32 32 0 0 1 46 22 22 22 0 0 1 14 42z"/></symbol>
+    <symbol id="i-presente" viewBox="0 0 120 120">
+      <rect x="14" y="48" width="92" height="64" rx="6" fill="#fe6e25"/>
+      <rect x="8" y="34" width="104" height="22" rx="6" fill="#ff8a4c"/>
+      <rect x="52" y="34" width="16" height="78" fill="#fed261"/>
+      <path d="M60 34c-6-14-26-26-34-16-7 9 10 16 34 16zm0 0c6-14 26-26 34-16 7 9-10 16-34 16z" fill="#fed261" stroke="#e8b43e" stroke-width="2"/>
+      <rect x="14" y="56" width="92" height="5" fill="#001941" opacity=".12"/>
+    </symbol>
+    <symbol id="i-carimbo" viewBox="0 0 150 70">
+      <g fill="none" stroke="currentColor" stroke-width="2.2">
+        <circle cx="35" cy="35" r="30"/><circle cx="35" cy="35" r="24" stroke-width="1.2"/>
+        <path d="M70 18c8-5 14 5 22 0s14 5 22 0 14 5 22 0 8-2 12-1M70 30c8-5 14 5 22 0s14 5 22 0 14 5 22 0 8-2 12-1M70 42c8-5 14 5 22 0s14 5 22 0 14 5 22 0 8-2 12-1M70 54c8-5 14 5 22 0s14 5 22 0 14 5 22 0 8-2 12-1"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<nav class="nav">
+  <div class="container">
+    <a class="nav-marca" href="#topo">
+      <span class="display">Amigo<br>Secreto 26</span>
+      <span class="sep"></span>
+      <small>Lista de desejos da equipe</small>
+    </a>
+    <div class="nav-links">
+      <a class="btn claro sem-seta" href="#lista">Ver a lista</a>
+      <a class="btn" href="#enviar">Enviar sugestão</a>
+    </div>
+  </div>
+</nav>
+
+<header class="ceu hero" id="topo">
+  <div class="container">
+    <h1 class="display">
+      <span class="linha">Amigo</span>
+      <span class="linha">Secreto</span>
+      <span class="linha"><svg class="emblema" viewBox="0 0 120 100" aria-hidden="true">
+        <g fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+          <rect x="16" y="40" width="88" height="54" rx="4"/><rect x="10" y="26" width="100" height="16" rx="4"/>
+          <path d="M60 26v68M60 26c-6-14-28-24-34-14-5 9 12 14 34 14zm0 0c6-14 28-24 34-14 5 9-12 14-34 14z"/>
+        </g></svg>2026</span>
+    </h1>
+    <p class="lema display">Peça o que <em>você</em> quer ganhar</p>
+    <div class="meta" aria-live="polite">
+      <div><div class="rotulo">Participantes</div><div class="valor" id="hero-total">—</div></div>
+      <div><div class="rotulo">Já enviaram</div><div class="valor" id="hero-enviaram">—</div></div>
+      <div><div class="rotulo">Sugestões</div><div class="valor" id="hero-sugestoes">—</div></div>
+    </div>
+    <a class="btn" href="#enviar">Enviar minha sugestão</a>
+  </div>
+
+  <svg class="voador" viewBox="0 0 220 170" aria-hidden="true">
+    <g stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".9">
+      <path d="M8 96h40M20 116h34M2 136h44"/>
+    </g>
+    <g transform="rotate(-10 130 95)">
+      <path d="M78 64c-30-30-62-28-66-10 22-2 40 10 58 24z" fill="#fff" opacity=".95"/>
+      <use href="#i-presente" x="62" y="30" width="130" height="130"/>
+      <path d="M190 58c26-30 30-52 16-56-8 18-20 32-36 44z" fill="#fff" opacity=".95"/>
+    </g>
+  </svg>
+
+  <div class="nuvens" aria-hidden="true">
+    <svg class="nuvem rosa" style="left:-2%;bottom:70px;width:300px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem" style="left:-4%;bottom:0;width:380px;height:150px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem lilas" style="left:30%;bottom:40px;width:240px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem" style="left:44%;bottom:-6px;width:460px;height:170px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem rosa" style="right:2%;bottom:80px;width:260px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem" style="right:-6%;bottom:-4px;width:340px;height:140px"><use href="#i-nuvem"/></svg>
+  </div>
+</header>
+
+<section class="secao" id="enviar">
+  <div class="container">
+    <div class="intro">
+      <h2 class="titulo-grande display">Sua lista,<br>nosso <span class="degrade">segredo</span></h2>
       <div>
-        <h1>Amigo Secreto 2026</h1>
-        <p class="subtitulo">Sugira o que você gostaria de ganhar. A lista é aberta; o sorteio é que é secreto 🤫</p>
+        <p><strong>A lista</strong> é aberta: todo mundo vê o que todo mundo pediu, e quem te tirou acerta no presente.</p>
+        <p><strong>O sorteio</strong> é secreto: só você sabe quem tirou, então nada de entregar o jogo por aqui.</p>
+        <p><strong>O presente</strong>, sem erro: mande até 6 ideias, com link da loja, foto e detalhes como tamanho e cor.</p>
       </div>
     </div>
-    <div class="acoes-topo">
-      <button class="secundario" id="btn-atualizar" title="Recarregar a lista">↻ Atualizar</button>
-      <button class="secundario" id="btn-tema" title="Alternar tema claro/escuro" aria-label="Alternar tema">◐</button>
-    </div>
-  </header>
 
-  <section class="progresso" id="progresso" hidden>
-    <div class="progresso-linha">
-      <span><strong id="qtd-enviaram">0</strong> de <strong id="qtd-total">0</strong> pessoas já sugeriram presentes</span>
-      <span id="qtd-pedidos"></span>
-    </div>
-    <div class="barra"><span id="barra" style="width:0"></span></div>
-    <details class="faltam" id="faltam" hidden>
-      <summary>Quem ainda não enviou (<span id="qtd-faltam">0</span>)</summary>
-      <div class="faltam-lista" id="faltam-lista"></div>
-    </details>
-  </section>
+    <form class="postal" id="form" novalidate>
+      <div>
+        <h2 class="display" id="form-titulo">Sua sugestão</h2>
+        <p class="dica" id="form-dica">Pode enviar mais de uma, até 6 por pessoa.</p>
 
-  <div class="layout">
-    <form class="cartao form" id="form" novalidate>
-      <h2 id="form-titulo">Sua sugestão</h2>
-      <p class="dica" id="form-dica">Pode enviar mais de uma, até 6 por pessoa.</p>
-
-      <div class="campo">
-        <label for="f-nome">Seu nome</label>
-        <select id="f-nome" required><option value="">Carregando…</option></select>
-      </div>
-      <div class="campo">
-        <label for="f-presente">O que você gostaria de ganhar?</label>
-        <input type="text" id="f-presente" maxlength="120" placeholder="Ex.: Livro “Torto Arado”" required>
-      </div>
-      <div class="campo">
-        <label for="f-link">Link da loja <span class="opcional">(opcional)</span></label>
-        <input type="url" id="f-link" inputmode="url" placeholder="https://…">
-      </div>
-      <div class="campo">
-        <label>Foto <span class="opcional">(opcional)</span></label>
-        <div class="foto" id="foto">
-          <img id="foto-previa" alt="Prévia da foto escolhida" hidden>
-          <label class="escolher" for="f-foto">📷 <span id="foto-rotulo">Escolher foto</span></label>
-          <button type="button" class="link perigo remover" id="foto-remover" hidden>Remover</button>
-          <input type="file" id="f-foto" accept="image/*">
+        <div class="campo">
+          <label for="f-nome">De (seu nome)</label>
+          <select id="f-nome" required><option value="">Carregando…</option></select>
+        </div>
+        <div class="campo">
+          <label for="f-presente">O que você gostaria de ganhar?</label>
+          <input type="text" id="f-presente" maxlength="120" placeholder="Ex.: Livro “Torto Arado”" required>
+        </div>
+        <div class="campo">
+          <label for="f-link">Link da loja <span class="opcional">(opcional)</span></label>
+          <input type="url" id="f-link" inputmode="url" placeholder="https://…">
+        </div>
+        <div class="campo">
+          <label for="f-detalhes">Detalhes <span class="opcional">(opcional)</span></label>
+          <textarea id="f-detalhes" maxlength="400" placeholder="Tamanho, cor, voltagem, sabor…"></textarea>
         </div>
       </div>
-      <div class="campo">
-        <label for="f-detalhes">Detalhes <span class="opcional">(opcional)</span></label>
-        <textarea id="f-detalhes" maxlength="400" placeholder="Tamanho, cor, voltagem, sabor…"></textarea>
-      </div>
 
-      <div class="botoes">
-        <button type="submit" class="primario" id="btn-enviar">Enviar sugestão</button>
-        <button type="button" class="secundario" id="btn-cancelar" hidden>Cancelar</button>
+      <div class="divisor" aria-hidden="true"></div>
+
+      <div class="verso">
+        <div class="verso-topo">
+          <svg class="carimbo" aria-hidden="true"><use href="#i-carimbo"/></svg>
+          <div class="selo-mini" aria-hidden="true">
+            <svg viewBox="0 0 60 72"><rect width="60" height="72" fill="#005fe2"/><rect width="60" height="72" fill="url(#g-selo)"/>
+              <defs><linearGradient id="g-selo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#005fe2"/><stop offset="1" stop-color="#ea97df"/></linearGradient></defs>
+              <use href="#i-presente" x="10" y="20" width="40" height="40"/>
+              <text x="6" y="14" font-family="Boldonse, Impact, sans-serif" font-size="7" fill="#fff">2026</text></svg>
+          </div>
+        </div>
+
+        <div>
+          <div class="campo" style="margin-bottom:0"><span class="rot">Foto <span class="opcional">(opcional)</span></span></div>
+          <label class="foto" id="foto" for="f-foto">
+            <img id="foto-previa" alt="Prévia da foto escolhida" hidden>
+            <span class="vazia" id="foto-vazia">📷 Toque para escolher uma foto<b id="foto-rotulo">Escolher foto</b></span>
+            <input type="file" id="f-foto" accept="image/*" aria-label="Foto do presente">
+          </label>
+        </div>
+        <div class="foto-acoes">
+          <span></span>
+          <button type="button" class="link-btn perigo" id="foto-remover" hidden>Remover foto</button>
+        </div>
+
+        <div class="destinatario">Para: quem tirar você no sorteio 🤫</div>
+
+        <div class="botoes">
+          <button type="submit" class="btn" id="btn-enviar">Enviar sugestão</button>
+          <button type="button" class="btn claro sem-seta" id="btn-cancelar" hidden>Cancelar</button>
+        </div>
+        <p class="msg" id="msg" role="status" hidden></p>
       </div>
-      <p class="msg" id="msg" role="status" hidden></p>
     </form>
+  </div>
+</section>
 
-    <main>
+<section class="ceu lista" id="lista">
+  <svg class="nuvem-alta" style="left:8%;top:40px;width:180px" aria-hidden="true"><use href="#i-nuvem"/></svg>
+  <svg class="nuvem-alta" style="right:4%;top:120px;width:220px" aria-hidden="true"><use href="#i-nuvem"/></svg>
+  <svg class="aviao" viewBox="0 0 100 50" aria-hidden="true"><path d="M2 24 98 2 40 30z" fill="#fff"/><path d="M40 30 98 2 52 46z" fill="#e8e2f7"/><path d="M40 30l6 16 6-2z" fill="#b9b2ee"/></svg>
+
+  <div class="container">
+    <div class="cabeca">
+      <div class="eyebrow">Da equipe para a equipe</div>
+      <h2 class="display">Lista por correio aéreo</h2>
+    </div>
+
+    <div class="painel" id="progresso" hidden>
+      <div class="progresso-linha">
+        <span><strong id="qtd-enviaram">0</strong> de <strong id="qtd-total">0</strong> pessoas já mandaram sugestões</span>
+        <span id="qtd-pedidos"></span>
+      </div>
+      <div class="barra"><span id="barra"></span></div>
+      <details class="faltam" id="faltam" hidden>
+        <summary>Quem ainda não enviou (<span id="qtd-faltam">0</span>)</summary>
+        <div class="faltam-lista" id="faltam-lista"></div>
+      </details>
       <div class="ferramentas">
         <input type="search" id="busca" placeholder="Buscar presente ou pessoa…" aria-label="Buscar">
         <select id="filtro-pessoa" aria-label="Filtrar por pessoa"><option value="">Todas as pessoas</option></select>
       </div>
-      <div id="mural"><p class="carregando">Carregando a lista…</p></div>
-    </main>
+    </div>
+
+    <div id="mural"><div class="aviso"><div class="icone">✉️</div><p>Abrindo o correio…</p></div></div>
   </div>
 
-  <footer>As sugestões ficam guardadas numa planilha da organização. Você pode editar ou apagar as suas neste mesmo aparelho.</footer>
-</div>
+  <div class="nuvens" aria-hidden="true">
+    <svg class="nuvem lilas" style="left:12%;bottom:60px;width:220px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem" style="left:-3%;bottom:-4px;width:420px;height:160px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem rosa" style="left:48%;bottom:56px;width:260px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem" style="left:38%;bottom:-8px;width:380px;height:150px"><use href="#i-nuvem"/></svg>
+    <svg class="nuvem" style="right:-4%;bottom:-2px;width:400px;height:160px"><use href="#i-nuvem"/></svg>
+  </div>
+</section>
+
+<footer class="rodape">
+  <div class="container">
+    <p class="display">Feliz amigo secreto! 🎁</p>
+    <p>As sugestões ficam guardadas numa planilha da organização. Você pode editar ou apagar as suas neste mesmo aparelho.</p>
+    <button class="btn claro" id="btn-atualizar">Atualizar a lista</button>
+  </div>
+</footer>
 
 <script>
 // ══════════════════════════════════════════════════════════════
@@ -219,6 +430,8 @@ const LADO_MAX_FOTO = 1200;          // px — a foto é reduzida antes de envia
 const QUALIDADE_FOTO = 0.85;
 const CHAVES = 'amigo-secreto-2026:chaves';
 const ULTIMO_NOME = 'amigo-secreto-2026:nome';
+const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const E = { participantes: [], pedidos: [], editando: null, foto: null, removerFoto: false, enviando: false };
 const $ = (id) => document.getElementById(id);
@@ -256,7 +469,7 @@ async function carregar(silencioso) {
     montarNomes();
     render();
   } catch (e) {
-    if (!silencioso) mural(vazio('⚠️', e.message));
+    if (!silencioso) mural(aviso('⚠️', e.message));
   } finally {
     btn.disabled = false;
   }
@@ -304,6 +517,7 @@ function mostrarFoto(src) {
   const img = $('foto-previa');
   img.hidden = !src;
   if (src) img.src = src; else img.removeAttribute('src');
+  $('foto-vazia').hidden = !!src;
   $('foto-rotulo').textContent = src ? 'Trocar foto' : 'Escolher foto';
   $('foto-remover').hidden = !src;
 }
@@ -419,8 +633,38 @@ function el(tag, attrs, filhos) {
   return n;
 }
 
-function vazio(icone, texto) {
-  return el('div', { class: 'vazio' }, [el('div', { style: 'font-size:40px', text: icone }), el('p', { text: texto })]);
+function usarSvg(id, classe, viewBox) {
+  const s = document.createElementNS(SVG_NS, 'svg');
+  s.setAttribute('class', classe);
+  if (viewBox) s.setAttribute('viewBox', viewBox);
+  s.setAttribute('aria-hidden', 'true');
+  const u = document.createElementNS(SVG_NS, 'use');
+  u.setAttribute('href', '#' + id);
+  s.appendChild(u);
+  return s;
+}
+
+// carimbo com a data em que a sugestão foi enviada
+function carimbo(iso) {
+  const s = usarSvg('i-carimbo', 'selo-carimbo', '0 0 150 70');
+  const d = iso ? new Date(iso) : null;
+  if (d && !isNaN(d)) {
+    const t = (y, txt, tam) => {
+      const n = document.createElementNS(SVG_NS, 'text');
+      n.setAttribute('x', '35'); n.setAttribute('y', y); n.setAttribute('text-anchor', 'middle');
+      n.setAttribute('fill', 'currentColor'); n.setAttribute('font-size', tam);
+      n.setAttribute('font-family', 'Boldonse, Impact, sans-serif');
+      n.textContent = txt;
+      s.appendChild(n);
+    };
+    t('30', String(d.getDate()).padStart(2, '0'), '11');
+    t('44', MESES[d.getMonth()], '9');
+  }
+  return s;
+}
+
+function aviso(icone, texto) {
+  return el('div', { class: 'aviso' }, [el('div', { class: 'icone', text: icone }), el('p', { text: texto })]);
 }
 
 function mural(...nos) { const m = $('mural'); m.textContent = ''; m.append(...nos); }
@@ -429,35 +673,44 @@ function cartaoPresente(p, minhas) {
   const meu = !!minhas[p.id];
   const imagem = p.imagem
     ? el('img', { src: p.imagem, alt: p.presente, loading: 'lazy', referrerpolicy: 'no-referrer',
-                  onerror: (ev) => { ev.target.replaceWith(document.createTextNode('🎁')); } })
-    : document.createTextNode('🎁');
-  const rodape = el('div', { class: 'rodape' }, [
+                  onerror: (ev) => { ev.target.replaceWith(usarSvg('i-presente', 'presente-svg', '0 0 120 120')); } })
+    : usarSvg('i-presente', 'presente-svg', '0 0 120 120');
+  const rodape = el('div', { class: 'selo-rodape' }, [
     /^https?:\/\//i.test(p.link)
-      ? el('a', { class: 'abrir', href: p.link, target: '_blank', rel: 'noopener noreferrer nofollow', text: 'Ver na loja ↗' })
+      ? el('a', { class: 'ver-loja', href: p.link, target: '_blank', rel: 'noopener noreferrer nofollow', text: 'Ver na loja' })
       : null,
-    meu ? el('button', { type: 'button', class: 'link', text: 'Editar', onclick: () => editar(p) }) : null,
-    meu ? el('button', { type: 'button', class: 'link perigo', text: 'Apagar', onclick: () => apagar(p) }) : null,
+    meu ? el('button', { type: 'button', class: 'link-btn', text: 'Editar', onclick: () => editar(p) }) : null,
+    meu ? el('button', { type: 'button', class: 'link-btn perigo', text: 'Apagar', onclick: () => apagar(p) }) : null,
   ]);
-  return el('article', { class: 'presente' + (meu ? ' meu' : '') }, [
-    el('div', { class: 'img' }, [imagem]),
-    el('div', { class: 'corpo' }, [
-      meu ? el('span', { class: 'selo-meu', text: '★ Sua sugestão' }) : null,
-      el('h4', { text: p.presente }),
-      p.detalhes ? el('p', { text: p.detalhes }) : null,
-      rodape,
-    ]),
+  return el('article', { class: 'selo' + (meu ? ' meu' : '') }, [
+    el('div', { class: 'selo-papel' }, [el('div', { class: 'selo-miolo' }, [
+      el('div', { class: 'selo-topo' }, [
+        el('div', { class: 'selo-img' }, [imagem, el('span', { class: 'valor-selo', text: '2026' })]),
+        carimbo(p.criadoEm),
+      ]),
+      el('div', { class: 'selo-corpo' }, [
+        meu ? el('span', { class: 'selo-meu', text: '★ Sua sugestão' }) : null,
+        el('h4', { text: p.presente }),
+        p.detalhes ? el('p', { text: p.detalhes }) : null,
+        rodape,
+      ]),
+    ])]),
   ]);
 }
 
 function render() {
-  // progresso
+  // progresso (hero + painel)
   const comPedido = new Set(E.pedidos.map((p) => p.nome));
   const enviaram = E.participantes.filter((n) => comPedido.has(n));
   const faltam = E.participantes.filter((n) => !comPedido.has(n));
+  const nSug = E.pedidos.length + (E.pedidos.length === 1 ? ' sugestão' : ' sugestões');
+  $('hero-total').textContent = E.participantes.length;
+  $('hero-enviaram').textContent = enviaram.length;
+  $('hero-sugestoes').textContent = E.pedidos.length;
   $('progresso').hidden = !E.participantes.length;
   $('qtd-enviaram').textContent = enviaram.length;
   $('qtd-total').textContent = E.participantes.length;
-  $('qtd-pedidos').textContent = E.pedidos.length + (E.pedidos.length === 1 ? ' sugestão' : ' sugestões');
+  $('qtd-pedidos').textContent = nSug;
   $('barra').style.width = (E.participantes.length ? 100 * enviaram.length / E.participantes.length : 0) + '%';
   $('faltam').hidden = !faltam.length;
   $('qtd-faltam').textContent = faltam.length;
@@ -471,8 +724,8 @@ function render() {
     (!pessoa || p.nome === pessoa) &&
     (!termo || normalizar(p.nome + ' ' + p.presente + ' ' + p.detalhes).indexOf(termo) >= 0));
 
-  if (!E.pedidos.length) { mural(vazio('🎄', 'Ninguém enviou sugestões ainda. Seja a primeira pessoa!')); return; }
-  if (!lista.length) { mural(vazio('🔍', 'Nenhuma sugestão encontrada com esse filtro.')); return; }
+  if (!E.pedidos.length) { mural(aviso('📮', 'A caixa de correio está vazia. Seja a primeira pessoa a enviar!')); return; }
+  if (!lista.length) { mural(aviso('🔍', 'Nenhuma sugestão encontrada com esse filtro.')); return; }
 
   // agrupa por pessoa, na ordem da lista de participantes
   const grupos = new Map();
@@ -484,7 +737,7 @@ function render() {
   mural(...ordem.map((nome) => {
     const ps = grupos.get(nome).sort((a, b) => String(a.criadoEm).localeCompare(String(b.criadoEm)));
     return el('section', { class: 'pessoa' }, [
-      el('h3', {}, [document.createTextNode(nome), el('small', { text: ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') })]),
+      el('h3', { class: 'display' }, [document.createTextNode(nome), el('small', { text: ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') })]),
       el('div', { class: 'grade' }, ps.map((p) => cartaoPresente(p, minhas))),
     ]);
   }));
@@ -516,15 +769,6 @@ $('foto-remover').addEventListener('click', () => { E.foto = null; E.removerFoto
 let espera;
 $('busca').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(render, 200); });
 $('filtro-pessoa').addEventListener('change', render);
-
-$('btn-tema').addEventListener('click', () => {
-  const root = document.documentElement;
-  const atual = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  const novo = atual === 'dark' ? 'light' : 'dark';
-  root.setAttribute('data-theme', novo);
-  gravarLocal('amigo-secreto-2026:tema', novo);
-});
-(function () { const t = lerLocal('amigo-secreto-2026:tema', null); if (t) document.documentElement.setAttribute('data-theme', t); })();
 
 // atualiza o mural sozinho a cada 2 min (sem atrapalhar quem está digitando)
 setInterval(() => { if (!document.hidden && !E.enviando) carregar(true); }, 120000);
