@@ -270,6 +270,34 @@
   .msg.ok { background: #e3f1e5; color: #1f5a2a; }
   .msg.erro { background: #ffe8dc; color: #9a3412; }
 
+  /* ── perguntas anônimas ─────────────────────────────────────── */
+  .btn.pequeno { padding: 9px 13px; font-size: 13px; }
+  .alerta-perguntas { display: flex; justify-content: space-between; align-items: center; gap: 8px 14px; flex-wrap: wrap;
+                      margin-top: 14px; padding: 10px 12px; background: #fff6e0; border-left: 3px solid var(--laranja); border-radius: 4px; font-size: 14px; }
+  .perguntas { margin-top: 18px; background: var(--creme); color: var(--navy); border-radius: 8px; padding: 14px 16px;
+               box-shadow: 0 0 0 1px var(--linha), 0 12px 26px -18px rgba(0, 25, 65, .5); }
+  .perguntas-cab { display: flex; justify-content: space-between; align-items: center; gap: 8px 14px; flex-wrap: wrap; font-size: 14px; color: var(--ardosia); }
+  .perguntas-cab b { color: var(--navy); }
+  .perguntas ul { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+  .pergunta { background: var(--branco); border-radius: 6px; padding: 10px 12px; box-shadow: inset 0 0 0 1px var(--linha); font-size: 14.5px; line-height: 1.45; }
+  .pergunta .q, .pergunta .r { margin: 0; display: flex; gap: 8px; }
+  .pergunta .q::before, .pergunta .r::before { flex: none; font: 400 11px/1.9 var(--display); }
+  .pergunta .q::before { content: "P"; color: var(--celeste); }
+  .pergunta .r { margin-top: 6px; font-weight: 600; }
+  .pergunta .r::before { content: "R"; color: var(--laranja); }
+  .pergunta .espera { margin: 4px 0 0 19px; font-size: 12.5px; color: var(--aco); }
+  .pergunta .responder { margin: 8px 0 0 19px; display: grid; gap: 8px; }
+  .pergunta .responder textarea { min-height: 44px; font-size: 15px; }
+  .pergunta .acoes { display: flex; gap: 6px 12px; flex-wrap: wrap; align-items: center; }
+  .pergunta .apagar-q { margin: 4px 0 0 19px; }
+  .pessoa .sem-sugestao { font-size: 14px; opacity: .9; margin: -6px 0 0; }
+  .dlg { border: 0; border-radius: 10px; padding: 22px 22px 18px; width: min(92vw, 460px); background: var(--creme); color: var(--navy);
+         box-shadow: 0 30px 60px -20px rgba(0, 25, 65, .6); }
+  .dlg::backdrop { background: rgba(0, 25, 65, .55); }
+  .dlg h3 { margin: 0 0 4px; font-size: 18px; line-height: 1.5; }
+  .dlg .dica { margin: 0 0 16px; font-size: 13.5px; color: var(--ardosia); }
+  .dlg .botoes { margin-top: 14px; }
+
   /* selo e carimbo (decorativos) */
   .selo-mini {
     width: 74px; padding: 4px; flex: none; transform: rotate(4deg);
@@ -495,6 +523,26 @@
   </div>
 </section>
 
+<dialog class="dlg" id="dlg-pergunta" aria-labelledby="dlg-pergunta-titulo">
+  <form id="form-pergunta" novalidate>
+    <h3 class="display" id="dlg-pergunta-titulo">Pergunta anônima</h3>
+    <p class="dica">Ficou na dúvida sobre o presente? Pergunte sem se identificar: ninguém fica sabendo quem perguntou, nem a organização. A pergunta e a resposta aparecem na lista da pessoa.</p>
+    <div class="campo">
+      <label for="p-para">Para</label>
+      <select id="p-para" required></select>
+    </div>
+    <div class="campo" style="margin-bottom:6px">
+      <label for="p-texto">Pergunta</label>
+      <textarea id="p-texto" maxlength="300" placeholder="Ex.: Qual seu tamanho de camiseta? Prefere livro físico ou Kindle?"></textarea>
+    </div>
+    <p class="msg" id="p-msg" role="status" hidden></p>
+    <div class="botoes">
+      <button type="submit" class="btn" id="p-enviar">Enviar pergunta</button>
+      <button type="button" class="link-btn" id="p-cancelar">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog class="poster-dialogo" id="poster-dialogo" aria-label="Pôster da confraternização">
   <img src="poster.webp" width="900" height="1080" alt="Pôster da Confraternização 2RI 2026 Sunset.">
   <button type="button" id="fechar-poster" aria-label="Fechar">×</button>
@@ -596,9 +644,14 @@
         <summary>Quem ainda não enviou (<span id="qtd-faltam">0</span>)</summary>
         <div class="faltam-lista" id="faltam-lista"></div>
       </details>
+      <div class="alerta-perguntas" id="alerta-perguntas" hidden>
+        <span id="alerta-perguntas-txt"></span>
+        <button type="button" class="btn pequeno" id="ir-perguntas">Responder</button>
+      </div>
       <div class="ferramentas">
         <input type="search" id="busca" placeholder="Buscar presente ou pessoa…" aria-label="Buscar">
         <select id="filtro-pessoa" aria-label="Filtrar por pessoa"><option value="">Todas as pessoas</option></select>
+        <button type="button" class="btn pequeno sem-seta" id="btn-perguntar">💬 Pergunta anônima</button>
       </div>
     </div>
 
@@ -636,7 +689,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const CODIGO = 'amigo-secreto-2026:codigo';
 
-const E = { participantes: [], pedidos: [], editando: null, foto: null, removerFoto: false, enviando: false,
+const E = { participantes: [], pedidos: [], perguntas: [], editando: null, foto: null, removerFoto: false, enviando: false,
             codigo: '', liberado: false,
             fotoLoja: null,        // endereço da foto achada pelo link da loja (o servidor guarda uma cópia)
             presenteAuto: '',      // nome preenchido automaticamente (só sobrescreve se a pessoa não mexeu)
@@ -680,6 +733,7 @@ async function carregar(silencioso) {
     const j = await api();
     E.participantes = j.participantes || [];
     E.pedidos = j.pedidos || [];
+    E.perguntas = j.perguntas || [];
     liberar();
     montarNomes();
     render();
@@ -1028,23 +1082,138 @@ function render() {
     (!pessoa || p.nome === pessoa) &&
     (!termo || normalizar(p.nome + ' ' + p.presente + ' ' + p.detalhes).indexOf(termo) >= 0));
 
-  if (!E.pedidos.length) { mural(aviso('📮', 'A caixa de correio está vazia. Seja a primeira pessoa a enviar!')); return; }
-  if (!lista.length) { mural(aviso('🔍', 'Nenhuma sugestão encontrada com esse filtro.')); return; }
+  // aviso de perguntas esperando resposta de quem usa este aparelho
+  const meus = meusNomes();
+  const pendentes = E.perguntas.filter((q) => meus.has(q.para) && !q.resposta);
+  $('alerta-perguntas').hidden = !pendentes.length;
+  $('alerta-perguntas-txt').textContent = pendentes.length === 1
+    ? '📬 Você tem 1 pergunta anônima esperando resposta.'
+    : '📬 Você tem ' + pendentes.length + ' perguntas anônimas esperando resposta.';
 
-  // agrupa por pessoa, na ordem da lista de participantes
+  // agrupa por pessoa (quem tem sugestões ou perguntas), na ordem da lista de participantes
   const grupos = new Map();
-  lista.forEach((p) => { if (!grupos.has(p.nome)) grupos.set(p.nome, []); grupos.get(p.nome).push(p); });
+  const grupo = (n) => { if (!grupos.has(n)) grupos.set(n, []); return grupos.get(n); };
+  lista.forEach((p) => grupo(p.nome).push(p));
+  if (!termo) E.perguntas.forEach((q) => { if (!pessoa || q.para === pessoa) grupo(q.para); });
+
+  if (!grupos.size) {
+    mural(E.pedidos.length || E.perguntas.length
+      ? aviso('🔍', 'Nenhuma sugestão encontrada com esse filtro.')
+      : aviso('📮', 'A caixa de correio está vazia. Seja a primeira pessoa a enviar!'));
+    return;
+  }
   const ordem = [...grupos.keys()].sort((a, b) => {
     const ia = E.participantes.indexOf(a), ib = E.participantes.indexOf(b);
     return (ia < 0 ? 1e9 : ia) - (ib < 0 ? 1e9 : ib) || a.localeCompare(b, 'pt-BR');
   });
   mural(...ordem.map((nome) => {
     const ps = grupos.get(nome).sort((a, b) => String(a.criadoEm).localeCompare(String(b.criadoEm)));
-    return el('section', { class: 'pessoa' }, [
-      el('h3', { class: 'display' }, [document.createTextNode(nome), el('small', { text: ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') })]),
-      el('div', { class: 'grade' }, ps.map((p) => cartaoPresente(p, minhas))),
+    return el('section', { class: 'pessoa', id: 'pessoa-' + normalizar(nome).replace(/[^a-z0-9]+/g, '-') }, [
+      el('h3', { class: 'display' }, [document.createTextNode(nome),
+        el('small', { text: ps.length ? ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') : '' })]),
+      ps.length ? el('div', { class: 'grade' }, ps.map((p) => cartaoPresente(p, minhas)))
+                : el('p', { class: 'sem-sugestao', text: 'Ainda não mandou sugestões. Para responder às perguntas, envie uma sugestão primeiro.' }),
+      blocoPerguntas(nome, meus.has(nome)),
     ]);
   }));
+}
+
+// ══════════════════════════════════════════════════════════════
+// Perguntas anônimas
+// ══════════════════════════════════════════════════════════════
+// nomes de quem usa este aparelho = donos das sugestões cujas chaves estão guardadas aqui
+function meusNomes() {
+  const c = minhasChaves();
+  return new Set(E.pedidos.filter((p) => c[p.id]).map((p) => p.nome));
+}
+
+// "prova" de que este aparelho é da pessoa: uma sugestão dela + a chave
+function provaDe(nome) {
+  const c = minhasChaves();
+  const p = E.pedidos.find((x) => x.nome === nome && c[x.id]);
+  return p ? { id: p.id, chave: c[p.id] } : null;
+}
+
+function blocoPerguntas(nome, souEu) {
+  const qs = E.perguntas.filter((q) => q.para === nome)
+    .sort((a, b) => String(a.criadoEm).localeCompare(String(b.criadoEm)));
+  const cab = el('div', { class: 'perguntas-cab' }, [
+    el('span', {}, qs.length
+      ? [el('b', { text: '💬 ' + qs.length + (qs.length === 1 ? ' pergunta anônima' : ' perguntas anônimas') })]
+      : [document.createTextNode(souEu ? 'Ninguém te perguntou nada ainda.' : 'Ficou com dúvida sobre o que ' + nome + ' quer?')]),
+    souEu ? null : el('button', { type: 'button', class: 'link-btn', text: 'Perguntar anonimamente', onclick: () => abrirPergunta(nome) }),
+  ]);
+  return el('div', { class: 'perguntas' }, [
+    cab,
+    qs.length ? el('ul', {}, qs.map((q) => itemPergunta(q, souEu))) : null,
+  ]);
+}
+
+function itemPergunta(q, souEu) {
+  const filhos = [el('p', { class: 'q', text: q.pergunta })];
+  if (q.resposta) filhos.push(el('p', { class: 'r', text: q.resposta }));
+  if (souEu && !q.resposta) {
+    const txt = el('textarea', { maxlength: '400', placeholder: 'Sua resposta (aparece para todo mundo)', 'aria-label': 'Resposta' });
+    const btn = el('button', { type: 'button', class: 'btn pequeno', text: 'Responder' });
+    const msg = el('span', { class: 'espera' });
+    btn.addEventListener('click', async () => {
+      const r = txt.value.trim();
+      if (!r) { txt.focus(); return; }
+      btn.disabled = true; btn.textContent = 'Enviando…';
+      try { await api({ acao: 'responder', id: q.id, resposta: r, prova: provaDe(q.para) }); await carregar(true); }
+      catch (e) { msg.textContent = e.message; btn.disabled = false; btn.textContent = 'Responder'; }
+    });
+    filhos.push(el('div', { class: 'responder' }, [txt, el('div', { class: 'acoes' }, [btn, botaoApagarPergunta(q), msg])]));
+  } else if (souEu) {
+    filhos.push(el('div', { class: 'apagar-q' }, [botaoApagarPergunta(q)]));
+  } else if (!q.resposta) {
+    filhos.push(el('p', { class: 'espera', text: 'Aguardando resposta…' }));
+  }
+  return el('li', { class: 'pergunta' }, filhos);
+}
+
+function botaoApagarPergunta(q) {
+  return el('button', { type: 'button', class: 'link-btn perigo', text: 'Apagar pergunta', onclick: async (ev) => {
+    if (!confirm('Apagar esta pergunta?')) return;
+    ev.target.disabled = true;
+    try { await api({ acao: 'apagarPergunta', id: q.id, prova: provaDe(q.para) }); await carregar(true); }
+    catch (e) { alert(e.message); ev.target.disabled = false; }
+  } });
+}
+
+function abrirPergunta(para) {
+  const sel = $('p-para');
+  sel.replaceChildren(el('option', { value: '', text: 'Escolha a pessoa…' }),
+    ...E.participantes.map((n) => el('option', { value: n, text: n })));
+  sel.value = para || '';
+  $('p-texto').value = '';
+  $('p-msg').hidden = true;
+  $('p-enviar').disabled = false; $('p-enviar').textContent = 'Enviar pergunta';
+  const dlg = $('dlg-pergunta');
+  if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+  (para ? $('p-texto') : sel).focus();
+}
+
+function fecharPergunta() { const d = $('dlg-pergunta'); if (d.close) d.close(); else d.removeAttribute('open'); }
+
+async function enviarPergunta(ev) {
+  ev.preventDefault();
+  const para = $('p-para').value, texto = $('p-texto').value.trim();
+  const msg = (t, tipo) => { const m = $('p-msg'); m.textContent = t; m.className = 'msg ' + tipo; m.hidden = !t; };
+  if (!para) { msg('Escolha para quem é a pergunta.', 'erro'); $('p-para').focus(); return; }
+  if (texto.length < 3) { msg('Escreva a pergunta.', 'erro'); $('p-texto').focus(); return; }
+  const btn = $('p-enviar');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  try {
+    await api({ acao: 'perguntar', para: para, pergunta: texto });
+    fecharPergunta();
+    await carregar(true);
+    const alvo = $('pessoa-' + normalizar(para).replace(/[^a-z0-9]+/g, '-'));
+    if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    msg(e.message, 'erro');
+    btn.disabled = false; btn.textContent = 'Enviar pergunta';
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1085,6 +1254,16 @@ $('busca').addEventListener('input', () => { clearTimeout(espera); espera = setT
 $('filtro-pessoa').addEventListener('change', render);
 
 $('portao').addEventListener('submit', entrar);
+
+$('btn-perguntar').addEventListener('click', () => abrirPergunta($('filtro-pessoa').value));
+$('form-pergunta').addEventListener('submit', enviarPergunta);
+$('p-cancelar').addEventListener('click', fecharPergunta);
+$('dlg-pergunta').addEventListener('click', (ev) => { if (ev.target === ev.currentTarget) fecharPergunta(); });
+$('ir-perguntas').addEventListener('click', () => {
+  const nome = [...meusNomes()].find((n) => E.perguntas.some((q) => q.para === n && !q.resposta));
+  const alvo = nome && $('pessoa-' + normalizar(nome).replace(/[^a-z0-9]+/g, '-'));
+  if (alvo) alvo.querySelector('.perguntas').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
 
 // ── pôster ampliado ────────────────────────────────────────────
 (() => {
