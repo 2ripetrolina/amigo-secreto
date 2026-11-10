@@ -157,65 +157,26 @@
   @keyframes foto-zoom { from { scale: 1; } to { scale: 1.07; } }
   .no-sol { left: var(--sx); top: var(--sy); translate: -50% -50%; aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; }
 
-  /* ── sol: coroa, raios girando, risco anamórfico e fantasmas da lente ── */
-  .coroa { width: 34%;
-           background: radial-gradient(closest-side, rgba(255, 252, 228, .95) 0 15%, rgba(255, 236, 180, .6) 21%, rgba(255, 196, 130, .3) 38%,
-                                                     rgba(255, 150, 140, .1) 62%, rgba(255, 150, 140, 0) 100%);
-           animation: halo 6s ease-in-out infinite alternate; }
-  @keyframes halo { from { scale: .93; opacity: .72; } to { scale: 1.06; opacity: 1; } }
-  .anel { width: 46%; opacity: .8;
-          background: radial-gradient(closest-side, transparent 84%, rgba(255, 190, 150, .1) 88%, rgba(255, 230, 190, .16) 91%,
-                                                    rgba(170, 180, 255, .12) 94%, transparent 98%);
-          animation: halo 6s ease-in-out infinite alternate-reverse; }
-
-  /* raios: duas camadas com espaçamentos diferentes girando em sentidos opostos (ficam irregulares, como luz de verdade) */
-  .raios-sol { width: 86%; border-radius: 0; opacity: .9;
-               -webkit-mask-image: radial-gradient(closest-side, #000 7%, rgba(0, 0, 0, .55) 24%, rgba(0, 0, 0, .14) 52%, transparent 78%),
-                                   linear-gradient(#000 47%, rgba(0, 0, 0, .3) 53%, transparent 64%);
-               -webkit-mask-composite: source-in;
-               mask-image: radial-gradient(closest-side, #000 7%, rgba(0, 0, 0, .55) 24%, rgba(0, 0, 0, .14) 52%, transparent 78%),
-                           linear-gradient(#000 47%, rgba(0, 0, 0, .3) 53%, transparent 64%);
-               mask-composite: intersect; }
-  .raios-sol::before, .raios-sol::after { content: ""; position: absolute; inset: 0; border-radius: 50%; }
-  .raios-sol::before {
-    background: repeating-conic-gradient(from 3deg, rgba(255, 238, 196, 0) 0deg, rgba(255, 238, 196, .42) 1.4deg, rgba(255, 238, 196, 0) 3.2deg 11deg);
-    animation: girar-sol 150s linear infinite; }
-  .raios-sol::after {
-    background: repeating-conic-gradient(from 0deg, rgba(255, 214, 170, 0) 0deg, rgba(255, 214, 170, .3) 2.4deg, rgba(255, 214, 170, 0) 5deg 17deg);
-    animation: girar-sol 210s linear infinite reverse; }
-  @keyframes girar-sol { to { rotate: 360deg; } }
-  /* estrela: quatro pontas finas e longas, cintilando */
-  .estrela-sol { width: 40%; border-radius: 0;
-                 background: conic-gradient(from -2deg, rgba(255, 248, 225, .75) 0 4deg, transparent 4deg 86deg, rgba(255, 248, 225, .55) 86deg 94deg,
-                                            transparent 94deg 176deg, rgba(255, 248, 225, .75) 176deg 184deg, transparent 184deg 266deg,
-                                            rgba(255, 248, 225, .55) 266deg 274deg, transparent 274deg);
-                 -webkit-mask-image: radial-gradient(closest-side, #000 4%, rgba(0, 0, 0, .35) 26%, transparent 100%);
-                 mask-image: radial-gradient(closest-side, #000 4%, rgba(0, 0, 0, .35) 26%, transparent 100%);
-                 rotate: 8deg; animation: cintilar-sol 4.6s ease-in-out infinite alternate; }
-  @keyframes cintilar-sol { from { opacity: .45; scale: .9; rotate: 6deg; } to { opacity: 1; scale: 1.08; rotate: 10deg; } }
-  /* risco horizontal azulado, típico de lente */
-  .risco { width: 74%; height: 1.1%; aspect-ratio: auto; border-radius: 50%; filter: blur(1.2px);
-           background: radial-gradient(closest-side, rgba(255, 252, 240, .95), rgba(255, 220, 190, .5) 22%, rgba(190, 200, 255, .22) 55%, transparent);
-           animation: risco 6s ease-in-out infinite alternate; }
-  @keyframes risco { from { scale: .78 1; opacity: .55; } to { scale: 1.04 1.15; opacity: 1; } }
-
-  /* fantasmas da lente: alinhados do sol para o centro, oscilando como se a câmera respirasse */
-  .fantasmas { inset: 0; transform-origin: var(--sx) var(--sy); animation: oscila 17s ease-in-out infinite alternate; }
-  @keyframes oscila { from { rotate: -2.2deg; opacity: .75; } to { rotate: 2.2deg; opacity: 1; } }
+  /* ── sol: brilho realista (núcleo estourado + luz quente espalhada no horizonte) e um flare bem discreto ── */
+  .luz-sol { width: 64%; aspect-ratio: 2 / 1; border-radius: 50%;
+             background: radial-gradient(closest-side, rgba(255, 228, 176, .38) 0%, rgba(255, 198, 150, .2) 28%, rgba(255, 160, 150, .08) 58%, rgba(255, 150, 150, 0) 100%);
+             animation: respira 10s ease-in-out infinite alternate; }
+  @keyframes respira { from { opacity: .78; } to { opacity: 1; } }
+  .nucleo { width: 16%;
+            background: radial-gradient(closest-side, rgba(255, 253, 242, .55) 0%, rgba(255, 250, 228, .44) 50%, rgba(255, 238, 196, .28) 68%,
+                                                      rgba(255, 214, 160, .12) 84%, rgba(255, 200, 150, 0) 100%);
+            animation: nucleo 5s ease-in-out infinite alternate; }
+  @keyframes nucleo { from { opacity: .82; scale: .985; } to { opacity: 1; scale: 1.015; } }
+  .risco { width: 46%; height: .45%; aspect-ratio: auto; filter: blur(1px); opacity: .3;
+           background: radial-gradient(closest-side, rgba(255, 250, 238, .9), rgba(255, 226, 200, .35) 30%, rgba(200, 210, 255, .1) 65%, transparent); }
+  /* dois reflexos de lente quase imperceptíveis, alinhados do sol para o centro */
+  .fantasmas { inset: 0; transform-origin: var(--sx) var(--sy); animation: oscila 20s ease-in-out infinite alternate; }
+  @keyframes oscila { from { rotate: -1.5deg; } to { rotate: 1.5deg; } }
   .fantasmas i { position: absolute; translate: -50% -50%; aspect-ratio: 1; border-radius: 50%; mix-blend-mode: screen; }
-  .fantasmas .g1 { left: 41.5%; top: 54.8%; width: 1.5%; background: radial-gradient(closest-side, rgba(255, 236, 190, .8), rgba(255, 190, 120, .2) 70%, transparent); }
-  .fantasmas .g2 { left: 47.2%; top: 51.6%; width: 4.2%;
-                   background: radial-gradient(closest-side, rgba(120, 230, 220, .05) 55%, rgba(120, 230, 220, .28) 84%, rgba(180, 255, 240, .4) 92%, transparent 100%); }
-  .fantasmas .g3 { left: 54.7%; top: 47.3%; width: 6.4%; border-radius: 0; filter: blur(.8px);
-                   clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
-                   background: radial-gradient(closest-side, rgba(255, 140, 210, .08), rgba(255, 140, 210, .2) 80%, rgba(255, 190, 230, .32) 100%); }
-  .fantasmas .g4 { left: 61.4%; top: 43.6%; width: 2.8%; background: radial-gradient(closest-side, rgba(170, 255, 190, .3), rgba(120, 220, 255, .12) 70%, transparent); }
-  .fantasmas .g5 { left: 70.9%; top: 38.3%; width: 12%;
-                   background: radial-gradient(closest-side, transparent 72%, rgba(255, 170, 120, .08) 82%, rgba(255, 220, 150, .16) 90%, rgba(150, 170, 255, .1) 95%, transparent 100%); }
-  .fantasmas .g6 { left: 77.5%; top: 34.5%; width: 1.9%; background: radial-gradient(closest-side, rgba(200, 160, 255, .55), transparent); }
-  .fantasmas .g7 { left: 86%; top: 29.7%; width: 4.6%; border-radius: 0; filter: blur(1px);
-                   clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
-                   background: radial-gradient(closest-side, rgba(255, 210, 140, .12), rgba(255, 200, 130, .22) 100%); }
+  .fantasmas .g1 { left: 48.1%; top: 51.1%; width: 3.6%;
+                   background: radial-gradient(closest-side, rgba(255, 220, 180, .05) 60%, rgba(255, 220, 180, .12) 88%, transparent 100%); }
+  .fantasmas .g2 { left: 63.5%; top: 42.4%; width: 7.5%;
+                   background: radial-gradient(closest-side, rgba(170, 200, 255, .03) 50%, rgba(200, 190, 255, .08) 86%, transparent 100%); }
 
   /* ── água: cópia da foto recortada na lâmina d'água e ondulada por um filtro SVG ── */
   .agua { inset: 0; background: url("hero.webp") 0 0 / 100% 100% no-repeat; filter: url(#ondas);
@@ -712,12 +673,10 @@
       <img src="hero.webp" width="1672" height="941" alt="" fetchpriority="high">
       <div class="agua"></div>
       <div class="cintilas"><i></i><i></i><i></i></div>
-      <div class="no-sol raios-sol"></div>
-      <div class="no-sol coroa"></div>
-      <div class="no-sol anel"></div>
-      <div class="no-sol estrela-sol"></div>
+      <div class="no-sol luz-sol"></div>
+      <div class="no-sol nucleo"></div>
       <div class="no-sol risco"></div>
-      <div class="fantasmas"><i class="g1"></i><i class="g2"></i><i class="g3"></i><i class="g4"></i><i class="g5"></i><i class="g6"></i><i class="g7"></i></div>
+      <div class="fantasmas"><i class="g1"></i><i class="g2"></i></div>
       <div class="no-radio batida"></div>
       <div class="no-radio som"></div><div class="no-radio som s2"></div><div class="no-radio som s3"></div>
       <div class="no-radio dial"></div>
