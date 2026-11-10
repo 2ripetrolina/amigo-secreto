@@ -176,6 +176,15 @@
   .agua { inset: 0; background: url("hero-2ri.webp") 0 0 / 100% 100% no-repeat; filter: url(#ondas);
           -webkit-mask: url("agua-mascara.webp") 0 0 / 100% 100% no-repeat; mask: url("agua-mascara.webp") 0 0 / 100% 100% no-repeat; }
 
+  /* ── capim: cópia só dos tufos, deslocada para os lados pelo filtro #vento.
+        O mapa (capim-vento.webp) vale 0 na base de cada tufo e cresce até as pontas: a base fica presa, o pendão balança. ── */
+  .capim { inset: 0; background: url("hero-2ri.webp") 0 0 / 100% 100% no-repeat; filter: url(#vento);
+           -webkit-mask: url("capim-mascara.webp") 0 0 / 100% 100% no-repeat; mask: url("capim-mascara.webp") 0 0 / 100% 100% no-repeat; }
+
+  /* fora da tela ou com a aba em segundo plano, tudo para (economiza bateria e deixa a rolagem leve) */
+  .cena.pausado, .cena.pausado::before, .cena.pausado::after,
+  .cena.pausado *, .cena.pausado *::before, .cena.pausado *::after { animation-play-state: paused !important; }
+
   /* ── vento: algumas folhas soltando da árvore e descendo pela colina, girando ── */
   .folhas { inset: 0; }
   .folhas > b { position: absolute; inset: 0; opacity: 0; animation: folha-voo var(--t) cubic-bezier(.3, .1, .6, 1) infinite var(--d); }
@@ -401,7 +410,7 @@
   .portao-linha:focus-within { box-shadow: 0 0 0 3px var(--amarelo), 0 10px 30px -10px rgba(0, 25, 65, .45); }
   .portao-msg { margin: 12px 0 0; text-align: center; font-size: 14px; opacity: .95; min-height: 1.6em; }
   .portao-msg.erro { color: var(--navy); background: var(--amarelo); border-radius: 6px; padding: 6px 10px; opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .agua { filter: none; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .agua { filter: none; } .capim { display: none; } }
   @media (max-width: 700px) { .hero { padding-bottom: 310px; } }
 
   /* ── convite da confraternização (pôster) ───────────────────── */
@@ -739,6 +748,7 @@
     <div class="paisagem">
       <img src="hero-2ri.webp" width="1672" height="941" alt="" fetchpriority="high">
       <div class="agua"></div>
+      <div class="capim"></div>
       <div class="cintilas"><i></i><i></i><i></i></div>
       <div class="folhas">
         <b style="--t:17s;--d:-2s;--dx:6%;--dy:24%"><i style="--x:9%;--y:40%;--g:2.2s"></i></b>
@@ -767,6 +777,15 @@
         </feOffset>
         <feDisplacementMap in="SourceGraphic" in2="mov" scale="7" xChannelSelector="R" yChannelSelector="G">
           <animate attributeName="scale" dur="7s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1; .45 0 .55 1" values="5; 9; 5"/>
+        </feDisplacementMap>
+      </filter>
+      <!-- vento no capim: rajadas para a direita (escala negativa empurra o conteúdo para a direita) -->
+      <filter id="vento" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB" primitiveUnits="objectBoundingBox">
+        <feImage href="capim-vento.webp" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="mapa"/>
+        <feDisplacementMap in="SourceGraphic" in2="mapa" scale="-0.002" xChannelSelector="R" yChannelSelector="G">
+          <animate attributeName="scale" dur="9s" repeatCount="indefinite" calcMode="spline"
+                   keyTimes="0; .18; .3; .46; .62; .78; 1" values="-0.0008; -0.0042; -0.0018; -0.0034; -0.0006; -0.0028; -0.0008"
+                   keySplines=".45 0 .55 1; .45 0 .55 1; .45 0 .55 1; .45 0 .55 1; .45 0 .55 1; .45 0 .55 1"/>
         </feDisplacementMap>
       </filter>
     </svg>
@@ -2004,6 +2023,31 @@ if (contagem()) { const t = setInterval(() => { if (!contagem()) clearInterval(t
 setInterval(() => { if (E.liberado && !document.hidden && !E.enviando) carregar(true); }, 120000);
 
 // entra direto se o código já foi digitado antes neste aparelho
+// pausa as animações das cenas que estão fora da tela, e de todas quando a aba vai para segundo plano
+(function pausarForaDaTela() {
+  const cenas = Array.from(document.querySelectorAll('.cena'));
+  const filtros = Array.from(document.querySelectorAll('svg.filtros'));   // ondas da água e vento no capim (SMIL)
+  const visiveis = new Set();
+  function aplicar() {
+    const oculta = document.hidden;
+    cenas.forEach((c) => c.classList.toggle('pausado', oculta || !visiveis.has(c)));
+    filtros.forEach((s) => {
+      const parar = oculta || !visiveis.has(s.closest('.cena'));
+      try { if (parar) s.pauseAnimations(); else s.unpauseAnimations(); } catch (e) { /* navegador sem SMIL */ }
+    });
+  }
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((itens) => {
+      itens.forEach((it) => { if (it.isIntersecting) visiveis.add(it.target); else visiveis.delete(it.target); });
+      aplicar();
+    }, { rootMargin: '100px 0px' });
+    cenas.forEach((c) => io.observe(c));
+  } else {
+    cenas.forEach((c) => visiveis.add(c));
+  }
+  document.addEventListener('visibilitychange', aplicar);
+})();
+
 (function iniciar() {
   const salvo = lerLocal(CODIGO, '');
   if (salvo) { $('f-codigo').value = salvo; entrar(); }
