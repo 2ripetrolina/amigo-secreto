@@ -176,6 +176,32 @@
   .agua { inset: 0; background: url("hero-2ri.webp") 0 0 / 100% 100% no-repeat; filter: url(#ondas);
           -webkit-mask: url("agua-mascara.webp") 0 0 / 100% 100% no-repeat; mask: url("agua-mascara.webp") 0 0 / 100% 100% no-repeat; }
 
+  /* ── reflexo do sol: coluna de luz quente que "respira" junto com o sol + linhas de brilho chegando com as ondas.
+        Usa a mesma máscara e o mesmo filtro da água, então ondula junto e não passa para pedras e capim. ── */
+  .reflexo-sol { inset: 0; mix-blend-mode: screen; filter: url(#ondas-sol);
+                 -webkit-mask: url("agua-mascara.webp") 0 0 / 100% 100% no-repeat; mask: url("agua-mascara.webp") 0 0 / 100% 100% no-repeat; }
+  .reflexo-sol i { position: absolute; inset: 0; }
+  .reflexo-sol .rs-coluna { background:
+      radial-gradient(2.6% 9% at var(--sx) 69.5%, rgba(255, 246, 220, .55) 0%, rgba(255, 226, 180, .22) 55%, transparent 100%),
+      radial-gradient(4.8% 21% at var(--sx) 76%, rgba(255, 222, 176, .3) 0%, rgba(255, 186, 150, .12) 50%, transparent 100%);
+      animation: respira 10s ease-in-out infinite alternate; }
+  .reflexo-sol .rs-nucleo { background: radial-gradient(1.6% 3.2% at var(--sx) 69.2%, rgba(255, 252, 238, .7) 0%, rgba(255, 238, 200, .25) 60%, transparent 100%);
+      animation: nucleo-agua 5s ease-in-out infinite alternate; }
+  @keyframes nucleo-agua { from { opacity: .6; } to { opacity: 1; } }
+  .reflexo-sol .rs-linhas {
+      -webkit-mask-image: radial-gradient(4.2% 13% at var(--sx) 79%, #000 25%, transparent 100%);
+              mask-image: radial-gradient(4.2% 13% at var(--sx) 79%, #000 25%, transparent 100%);
+      background: repeating-linear-gradient(180deg, transparent 0 5px, rgba(255, 244, 214, .5) 6px, rgba(255, 244, 214, .5) 6.6px, transparent 8px 11px,
+                                                     rgba(255, 232, 196, .32) 12px, transparent 13.5px 17px);
+      animation: linhas-agua 4.5s linear infinite, linhas-pisca 2.7s ease-in-out infinite alternate; }
+  .reflexo-sol .rs-linhas.l2 { -webkit-mask-image: radial-gradient(3.4% 11% at calc(var(--sx) + .4%) 81%, #000 20%, transparent 100%);
+                                       mask-image: radial-gradient(3.4% 11% at calc(var(--sx) + .4%) 81%, #000 20%, transparent 100%);
+      background-size: 100% 23px;
+      animation: linhas-agua2 6.2s linear infinite -2s, linhas-pisca 3.4s ease-in-out infinite alternate -1.3s; }
+  @keyframes linhas-agua { from { background-position: 0 0; } to { background-position: 0 17px; } }
+  @keyframes linhas-pisca { from { opacity: .35; } to { opacity: .9; } }
+  @keyframes linhas-agua2 { from { background-position: 0 0; } to { background-position: 0 23px; } }
+
   /* ── capim: cópia só dos tufos, deslocada para os lados pelo filtro #vento.
         O mapa (capim-vento.webp) vale 0 na base de cada tufo e cresce até as pontas: a base fica presa, o pendão balança. ── */
   .capim { inset: 0; background: url("hero-2ri.webp") 0 0 / 100% 100% no-repeat; filter: url(#vento);
@@ -410,7 +436,7 @@
   .portao-linha:focus-within { box-shadow: 0 0 0 3px var(--amarelo), 0 10px 30px -10px rgba(0, 25, 65, .45); }
   .portao-msg { margin: 12px 0 0; text-align: center; font-size: 14px; opacity: .95; min-height: 1.6em; }
   .portao-msg.erro { color: var(--navy); background: var(--amarelo); border-radius: 6px; padding: 6px 10px; opacity: 1; }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .agua { filter: none; } .capim { display: none; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .agua, .reflexo-sol { filter: none; } .capim, .rs-linhas { display: none; } }
   @media (max-width: 700px) { .hero { padding-bottom: 310px; } }
 
   /* ── convite da confraternização (pôster) ───────────────────── */
@@ -761,6 +787,7 @@
     <div class="paisagem">
       <img src="hero-2ri.webp" width="1672" height="941" alt="" fetchpriority="high">
       <div class="agua"></div>
+      <div class="reflexo-sol"><i class="rs-coluna"></i><i class="rs-nucleo"></i><i class="rs-linhas"></i><i class="rs-linhas l2"></i></div>
       <div class="capim"></div>
       <div class="cintilas"><i></i><i></i><i></i></div>
       <div class="folhas">
@@ -781,6 +808,19 @@
     </div>
     <svg class="filtros" aria-hidden="true" focusable="false">
       <filter id="ondas" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.0032 0.048" numOctaves="2" seed="7" result="ruido">
+          <animate attributeName="baseFrequency" dur="14s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1; .45 0 .55 1"
+                   values="0.0032 0.048; 0.0038 0.056; 0.0032 0.048"/>
+        </feTurbulence>
+        <feOffset in="ruido" dx="0" dy="0" result="mov">
+          <animate attributeName="dy" dur="5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1; .45 0 .55 1" values="0; -14; 0"/>
+        </feOffset>
+        <feDisplacementMap in="SourceGraphic" in2="mov" scale="7" xChannelSelector="R" yChannelSelector="G">
+          <animate attributeName="scale" dur="7s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1; .45 0 .55 1" values="5; 9; 5"/>
+        </feDisplacementMap>
+      </filter>
+      <!-- mesmas ondas, calculadas só na faixa do reflexo do sol (menos trabalho para o celular) -->
+      <filter id="ondas-sol" x=".2" y=".64" width=".23" height=".34" color-interpolation-filters="sRGB">
         <feTurbulence type="fractalNoise" baseFrequency="0.0032 0.048" numOctaves="2" seed="7" result="ruido">
           <animate attributeName="baseFrequency" dur="14s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1; .45 0 .55 1"
                    values="0.0032 0.048; 0.0038 0.056; 0.0032 0.048"/>
