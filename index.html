@@ -507,7 +507,7 @@
   @keyframes girar { to { transform: rotate(360deg); } }
   .foto .selo-loja { position: absolute; left: 8px; bottom: 8px; z-index: 1; font: 700 10.5px/1 var(--texto); letter-spacing: .04em;
                      background: var(--navy); color: var(--branco); border-radius: 4px; padding: 5px 7px; }
-  input[type="text"], input[type="url"], input[type="search"], select, textarea {
+  input[type="text"], input[type="url"], input[type="search"], .dlg input[type="password"], select, textarea {
     font: 500 16px/1.4 var(--texto); color: var(--navy); width: 100%;
     background: transparent; border: 0; border-bottom: 1.5px solid #cdc2b4; border-radius: 0; padding: 8px 2px;
   }
@@ -561,6 +561,14 @@
   .dlg h3 { margin: 0 0 4px; font-size: 18px; line-height: 1.5; }
   .dlg .dica { margin: 0 0 16px; font-size: 13.5px; color: var(--ardosia); }
   .dlg .botoes { margin-top: 14px; }
+  /* meu acesso (PIN) */
+  .acesso-bloco { border-top: 1px dashed var(--linha); padding-top: 14px; margin-top: 14px; }
+  .acesso-bloco h4 { margin: 0 0 10px; font: 700 12px/1.3 var(--texto); letter-spacing: .06em; text-transform: uppercase; color: var(--azul); }
+  .acesso-bloco .par { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .acesso-atual { margin: 0; padding: 9px 11px; border-radius: 6px; background: #e3f1e5; color: #1f5a2a; font: 600 13.5px/1.4 var(--texto); }
+  #dlg-acesso .msg { margin-top: 12px; }
+  #dlg-acesso .botoes { justify-content: space-between; }
+  #a-fechar { margin-left: auto; }
 
   /* selo e carimbo (decorativos) */
   .selo-mini {
@@ -846,6 +854,39 @@
   </form>
 </dialog>
 
+<dialog class="dlg" id="dlg-acesso" aria-labelledby="dlg-acesso-titulo">
+  <h3 class="display" id="dlg-acesso-titulo">Meu acesso</h3>
+  <p class="dica">Para editar suas sugestões e responder perguntas em qualquer celular ou navegador, use um PIN só seu.</p>
+  <p class="acesso-atual" id="a-atual" hidden></p>
+
+  <form class="acesso-bloco" id="form-pin" novalidate hidden>
+    <h4>Criar ou trocar meu PIN</h4>
+    <div class="campo"><label for="pin-nome">Seu nome</label><select id="pin-nome"></select></div>
+    <div class="par">
+      <div class="campo"><label for="pin-novo">PIN</label>
+        <input type="password" id="pin-novo" inputmode="numeric" autocomplete="new-password" maxlength="8" placeholder="4 a 8 números"></div>
+      <div class="campo"><label for="pin-conf">Repita o PIN</label>
+        <input type="password" id="pin-conf" inputmode="numeric" autocomplete="new-password" maxlength="8"></div>
+    </div>
+    <button type="submit" class="btn pequeno" id="pin-salvar">Salvar PIN</button>
+  </form>
+
+  <form class="acesso-bloco" id="form-entrar" novalidate>
+    <h4>Entrar com meu PIN</h4>
+    <div class="campo"><label for="e-nome">Seu nome</label><select id="e-nome"></select></div>
+    <div class="campo"><label for="e-pin">PIN</label>
+      <input type="password" id="e-pin" inputmode="numeric" autocomplete="current-password" maxlength="8" placeholder="4 a 8 números"></div>
+    <button type="submit" class="btn pequeno" id="e-entrar">Entrar</button>
+  </form>
+
+  <p class="msg" id="a-msg" role="status" hidden></p>
+  <p class="dica" style="margin:14px 0 0">Esqueceu o PIN, ou não tem mais o aparelho onde enviou as sugestões? Peça um PIN para a organização.</p>
+  <div class="botoes">
+    <button type="button" class="link-btn perigo" id="a-sair" hidden>Esquecer meu PIN neste aparelho</button>
+    <button type="button" class="link-btn" id="a-fechar">Fechar</button>
+  </div>
+</dialog>
+
 <dialog class="poster-dialogo" id="poster-dialogo" aria-label="Pôster da confraternização">
   <img src="poster.webp" width="900" height="1080" alt="Pôster da Confraternização 2RI 2026 Sunset.">
   <button type="button" id="fechar-poster" aria-label="Fechar">×</button>
@@ -965,6 +1006,7 @@
         <input type="search" id="busca" placeholder="Buscar presente ou pessoa…" aria-label="Buscar">
         <select id="filtro-pessoa" aria-label="Filtrar por pessoa"><option value="">Todas as pessoas</option></select>
         <button type="button" class="btn pequeno sem-seta" id="btn-perguntar">💬 Pergunta anônima</button>
+        <button type="button" class="btn pequeno claro sem-seta" id="btn-acesso">🔑 Meu acesso</button>
       </div>
     </div>
 
@@ -1015,6 +1057,11 @@ function gravarLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); }
 const minhasChaves = () => lerLocal(CHAVES, {});
 function guardarChave(id, chave) { const c = minhasChaves(); c[id] = chave; gravarLocal(CHAVES, c); }
 function esquecerChave(id) { const c = minhasChaves(); delete c[id]; gravarLocal(CHAVES, c); }
+// acesso pessoal (entrou com o PIN): vale para todas as sugestões e perguntas da pessoa, em qualquer aparelho
+const ACESSO = 'amigo-secreto-2026:acesso';
+const meusAcessos = () => lerLocal(ACESSO, {}) || {};
+const tokenDe = (nome) => meusAcessos()[nome] || '';
+function guardarAcesso(nome, token) { const a = meusAcessos(); a[nome] = token; gravarLocal(ACESSO, a); }
 
 // ══════════════════════════════════════════════════════════════
 // API
@@ -1262,7 +1309,7 @@ function editar(p) {
 async function apagar(p) {
   if (!confirm('Apagar a sugestão “' + p.presente + '”?')) return;
   try {
-    await api({ acao: 'apagar', id: p.id, chave: minhasChaves()[p.id] });
+    await api({ acao: 'apagar', id: p.id, chave: minhasChaves()[p.id], token: tokenDe(p.nome) });
     esquecerChave(p.id);
     if (E.editando && E.editando.id === p.id) limparForm();
     mensagem('Sugestão apagada.', 'ok');
@@ -1312,7 +1359,7 @@ async function enviar(ev) {
     imagemLoja: !E.foto && E.fotoLoja ? E.fotoLoja : null,
   };
   if (E.editando) {
-    Object.assign(dados, { acao: 'editar', id: E.editando.id, chave: minhasChaves()[E.editando.id],
+    Object.assign(dados, { acao: 'editar', id: E.editando.id, chave: minhasChaves()[E.editando.id], token: tokenDe(E.editando.nome),
                            removerImagem: E.removerFoto && !E.foto });
   } else {
     Object.assign(dados, { acao: 'criar', nome: nome });
@@ -1337,11 +1384,12 @@ async function enviar(ev) {
       const nova = listaAntes.slice();
       nova.splice(pref - 1, 0, { id: id });
       const antes = daPessoa(nome).map((x) => x.id).join();
-      if (nova.map((x) => x.id).join() !== antes) await salvarOrdem(nova);
+      if (nova.map((x) => x.id).join() !== antes) await salvarOrdem(nova, nome);
     }
     limparForm();
     $('f-nome').value = nome;
-    mensagem(editou ? 'Sugestão atualizada! ✨' : 'Sugestão enviada! 🎉 Quer mandar outra?', 'ok');
+    mensagem(editou ? 'Sugestão atualizada! ✨'
+      : 'Sugestão enviada! 🎉 Quer mandar outra?' + (tokenDe(nome) ? '' : ' Dica: crie um PIN em “🔑 Meu acesso” para editar e responder também de outro celular.'), 'ok');
     await carregar(true);
     montarPreferencia();
   } catch (e) {
@@ -1420,29 +1468,29 @@ function moverPara(p, pos) {
   lista.splice(pos - 1, 0, lista.splice(i, 1)[0]);
   lista.forEach((x, k) => { x.ordem = k + 1; });          // muda na tela na hora
   render();
-  salvarOrdem(lista);
+  salvarOrdem(lista, p.nome);
 }
 function mover(p, delta) {
   const i = daPessoa(p.nome).findIndex((x) => x.id === p.id);
   moverPara(p, i + 1 + delta);
 }
-function salvarOrdem(lista) {
-  const c = minhasChaves();
-  const itens = lista.filter((x) => c[x.id]).map((x) => ({ id: x.id, chave: c[x.id] }));
-  filaOrdem = filaOrdem.then(() => api({ acao: 'reordenar', itens: itens }))
+function salvarOrdem(lista, nome) {
+  const c = minhasChaves(), token = tokenDe(nome);
+  const itens = lista.filter((x) => c[x.id] || token).map((x) => ({ id: x.id, chave: c[x.id] || '' }));
+  filaOrdem = filaOrdem.then(() => api({ acao: 'reordenar', itens: itens, token: token }))
     .catch((e) => { alert(e.message); return carregar(true); });
   return filaOrdem;
 }
 
-// pode reordenar = todas as sugestões da pessoa foram feitas neste aparelho
+// pode reordenar = entrou com o PIN, ou todas as sugestões da pessoa foram feitas neste aparelho
 function podeOrdenarNome(nome) {
   const c = minhasChaves();
-  return daPessoa(nome).every((x) => c[x.id]);
+  return !!tokenDe(nome) || daPessoa(nome).every((x) => c[x.id]);
 }
 const opcaoTxt = (n) => n + 'ª opção';
 
 function cartaoPresente(p, minhas, posicao, total, podeOrdenar) {
-  const meu = !!minhas[p.id];
+  const meu = !!minhas[p.id] || !!tokenDe(p.nome);
   const imagem = p.imagem
     ? el('img', { src: p.imagem, alt: p.presente, loading: 'lazy', referrerpolicy: 'no-referrer',
                   onerror: (ev) => { ev.target.replaceWith(usarSvg('i-presente', 'presente-svg', '0 0 120 120')); } })
@@ -1540,14 +1588,14 @@ function render() {
   mural(...ordem.map((nome) => {
     const ps = emOrdem(grupos.get(nome));
     const todas = daPessoa(nome);                                   // posição considera todas, mesmo com filtro
-    const podeOrdenar = todas.length > 1 && todas.every((x) => minhas[x.id]);
+    const podeOrdenar = todas.length > 1 && (!!tokenDe(nome) || todas.every((x) => minhas[x.id]));
     return el('section', { class: 'pessoa', id: 'pessoa-' + normalizar(nome).replace(/[^a-z0-9]+/g, '-') }, [
       el('h3', { class: 'display' }, [document.createTextNode(nome),
         el('small', { text: ps.length ? ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') + (todas.length > 1 ? ' · em ordem de preferência' : '') : '' })]),
       podeOrdenar ? el('p', { class: 'dica-ordem', text: 'Toque na etiqueta “1ª opção” dos seus cards (ou use ◀ ▶) para escolher a ordem: a 1ª é a que você mais quer.' }) : null,
       ps.length ? el('div', { class: 'grade' }, ps.map((p) =>
                     cartaoPresente(p, minhas, todas.findIndex((x) => x.id === p.id) + 1, todas.length, podeOrdenar)))
-                : el('p', { class: 'sem-sugestao', text: 'Ainda não mandou sugestões. Para responder às perguntas, envie uma sugestão primeiro.' }),
+                : el('p', { class: 'sem-sugestao', text: meus.has(nome) ? 'Você ainda não mandou sugestões.' : 'Ainda não mandou sugestões.' }),
       blocoPerguntas(nome, meus.has(nome)),
     ]);
   }));
@@ -1559,11 +1607,15 @@ function render() {
 // nomes de quem usa este aparelho = donos das sugestões cujas chaves estão guardadas aqui
 function meusNomes() {
   const c = minhasChaves();
-  return new Set(E.pedidos.filter((p) => c[p.id]).map((p) => p.nome));
+  const s = new Set(E.pedidos.filter((p) => c[p.id]).map((p) => p.nome));
+  Object.keys(meusAcessos()).forEach((n) => { if (E.participantes.indexOf(n) >= 0) s.add(n); });
+  return s;
 }
 
 // "prova" de que este aparelho é da pessoa: uma sugestão dela + a chave
 function provaDe(nome) {
+  const t = tokenDe(nome);
+  if (t) return { nome: nome, token: t };
   const c = minhasChaves();
   const p = E.pedidos.find((x) => x.nome === nome && c[x.id]);
   return p ? { id: p.id, chave: c[p.id] } : null;
@@ -1652,6 +1704,83 @@ async function enviarPergunta(ev) {
 }
 
 // ══════════════════════════════════════════════════════════════
+// Meu acesso (PIN)
+// ══════════════════════════════════════════════════════════════
+const idPessoa = (nome) => 'pessoa-' + normalizar(nome).replace(/[^a-z0-9]+/g, '-');
+function acessoMsg(t, tipo) { const m = $('a-msg'); m.textContent = t || ''; m.className = 'msg ' + (tipo || ''); m.hidden = !t; }
+
+function abrirAcesso() {
+  const meus = [...meusNomes()];
+  const opcoes = (sel, lista, vazio) => sel.replaceChildren(...(vazio ? [el('option', { value: '', text: vazio })] : []),
+    ...lista.map((n) => el('option', { value: n, text: n })));
+  opcoes($('pin-nome'), meus);
+  opcoes($('e-nome'), E.participantes, 'Escolha seu nome…');
+  const sugerido = meus[0] || lerLocal(ULTIMO_NOME, '');
+  $('e-nome').value = E.participantes.indexOf(sugerido) >= 0 ? sugerido : '';
+  $('form-pin').hidden = !meus.length;
+  $('a-atual').hidden = !meus.length;
+  $('a-atual').textContent = meus.length ? '✓ Neste aparelho você já pode editar e responder como ' + meus.join(' e ') + '.' : '';
+  $('a-sair').hidden = !Object.keys(meusAcessos()).length;
+  ['pin-novo', 'pin-conf', 'e-pin'].forEach((id) => { $(id).value = ''; });
+  acessoMsg('');
+  const dlg = $('dlg-acesso');
+  if (dlg.open) return;
+  if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+}
+function fecharAcesso() { const d = $('dlg-acesso'); if (d.close) d.close(); else d.removeAttribute('open'); }
+
+function depoisDoAcesso(nome) {
+  render();
+  if (!E.editando) montarPreferencia();
+  const alvo = $(idPessoa(nome));
+  if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function entrarComPin(ev) {
+  ev.preventDefault();
+  const nome = $('e-nome').value, pin = $('e-pin').value.replace(/\s+/g, '');
+  if (!nome) { acessoMsg('Escolha seu nome.', 'erro'); $('e-nome').focus(); return; }
+  if (!/^\d{4,8}$/.test(pin)) { acessoMsg('O PIN tem de 4 a 8 números.', 'erro'); $('e-pin').focus(); return; }
+  const btn = $('e-entrar');
+  btn.disabled = true; btn.textContent = 'Entrando…'; acessoMsg('');
+  try {
+    const r = await api({ acao: 'entrar', nome: nome, pin: pin });
+    guardarAcesso(r.nome, r.token);
+    gravarLocal(ULTIMO_NOME, r.nome);
+    fecharAcesso();
+    depoisDoAcesso(r.nome);
+  } catch (e) {
+    acessoMsg(e.message, 'erro');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+
+async function salvarPin(ev) {
+  ev.preventDefault();
+  const nome = $('pin-nome').value;
+  const a = $('pin-novo').value.replace(/\s+/g, ''), b = $('pin-conf').value.replace(/\s+/g, '');
+  if (!/^\d{4,8}$/.test(a)) { acessoMsg('O PIN precisa ter de 4 a 8 números.', 'erro'); $('pin-novo').focus(); return; }
+  if (a !== b) { acessoMsg('Os dois PINs não são iguais.', 'erro'); $('pin-conf').focus(); return; }
+  const prova = provaDe(nome);
+  if (!prova) { acessoMsg('Não encontrei suas sugestões neste aparelho. Peça um PIN para a organização.', 'erro'); return; }
+  const btn = $('pin-salvar');
+  btn.disabled = true; btn.textContent = 'Salvando…'; acessoMsg('');
+  try {
+    const r = await api({ acao: 'definirPin', nome: nome, pin: a, prova: prova });
+    guardarAcesso(r.nome, r.token);
+    $('pin-novo').value = ''; $('pin-conf').value = '';
+    $('a-sair').hidden = false;
+    acessoMsg('PIN salvo! Em outro celular ou navegador, toque em “🔑 Meu acesso” e entre com ele.', 'ok');
+    render();
+  } catch (e) {
+    acessoMsg(e.message, 'erro');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Salvar PIN';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 // Eventos
 // ══════════════════════════════════════════════════════════════
 $('form').addEventListener('submit', enviar);
@@ -1694,6 +1823,17 @@ $('portao').addEventListener('submit', entrar);
 
 $('btn-perguntar').addEventListener('click', () => abrirPergunta($('filtro-pessoa').value));
 $('form-pergunta').addEventListener('submit', enviarPergunta);
+$('btn-acesso').addEventListener('click', abrirAcesso);
+$('form-entrar').addEventListener('submit', entrarComPin);
+$('form-pin').addEventListener('submit', salvarPin);
+$('a-fechar').addEventListener('click', fecharAcesso);
+$('dlg-acesso').addEventListener('click', (ev) => { if (ev.target === ev.currentTarget) fecharAcesso(); });
+$('a-sair').addEventListener('click', () => {
+  if (!confirm('Esquecer o acesso com PIN neste aparelho? (As sugestões continuam salvas.)')) return;
+  gravarLocal(ACESSO, {});
+  render(); if (!E.editando) montarPreferencia();
+  abrirAcesso();
+});
 $('p-cancelar').addEventListener('click', fecharPergunta);
 $('dlg-pergunta').addEventListener('click', (ev) => { if (ev.target === ev.currentTarget) fecharPergunta(); });
 $('ir-perguntas').addEventListener('click', () => {
