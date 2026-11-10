@@ -179,7 +179,7 @@
                    background: radial-gradient(closest-side, rgba(170, 200, 255, .03) 50%, rgba(200, 190, 255, .08) 86%, transparent 100%); }
 
   /* ── água: cópia da foto recortada na lâmina d'água e ondulada por um filtro SVG ── */
-  .agua { inset: 0; background: url("hero.webp") 0 0 / 100% 100% no-repeat; filter: url(#ondas);
+  .agua { inset: 0; background: url("hero-2ri.webp") 0 0 / 100% 100% no-repeat; filter: url(#ondas);
           clip-path: polygon(0 74.5%, 26% 74.5%, 29% 72.4%, 31.6% 68.6%, 68.2% 68.6%, 68.2% 76.9%, 57.4% 79.5%, 49.6% 85%, 41.9% 87.4%,
                              33.5% 89.8%, 27.5% 88.2%, 25.1% 85.9%, 10.8% 86.3%, 6% 89.3%, 0 90.3%);
           -webkit-mask-image: linear-gradient(transparent 68.8%, #000 72.5%); mask-image: linear-gradient(transparent 68.8%, #000 72.5%); }
@@ -215,7 +215,7 @@
   /* cone do alto-falante vibrando de verdade: uma cópia do alto-falante da foto, alinhada por cima,
      que avança e recua na batida (com tranco, rebote e um zumbido fino de grave) */
   .cone { left: 72.85%; top: 70.67%; width: 7.2%;
-          background: url("hero.webp") 74.62% 73.7% / 1388.9% auto no-repeat;
+          background: url("hero-2ri.webp") 74.62% 73.7% / 1388.9% auto no-repeat;
           -webkit-mask-image: radial-gradient(closest-side, #000 64%, transparent 79%); mask-image: radial-gradient(closest-side, #000 64%, transparent 79%);
           animation: cone 1s linear infinite, zumbido .08s linear infinite alternate; }
   @keyframes cone {
@@ -233,11 +233,12 @@
             background: radial-gradient(closest-side, #fff 0 30%, rgba(255, 110, 90, .95) 55%, rgba(255, 90, 90, 0));
             box-shadow: 0 0 10px 3px rgba(255, 120, 100, .7); animation: piscar-antena 1.6s steps(1) infinite; }
   @keyframes piscar-antena { 0%, 60% { opacity: 1; } 61%, 100% { opacity: .25; } }
-  /* visor do dial aceso */
-  .dial { left: 82.06%; top: 77.6%; width: 6%; height: 4.4%; aspect-ratio: auto; mix-blend-mode: screen;
-          background: radial-gradient(closest-side, rgba(255, 214, 150, .65), rgba(255, 170, 100, .2) 60%, transparent);
-          animation: dial 3.4s ease-in-out infinite alternate; }
-  @keyframes dial { from { opacity: .5; } 40% { opacity: .9; } 46% { opacity: .65; } to { opacity: 1; } }
+  /* placa do cartório: um reflexo de luz atravessa o metal de vez em quando */
+  .placa { left: 80.8%; top: 78.1%; width: 11.3%; height: 7.2%; aspect-ratio: auto; border-radius: 4px; mix-blend-mode: screen;
+           background: linear-gradient(105deg, transparent 42%, rgba(255, 248, 226, .5) 49%, rgba(255, 255, 245, .7) 50%, rgba(255, 248, 226, .5) 51%, transparent 58%)
+                       no-repeat 130% 0 / 300% 100%;
+           animation: placa 8s ease-in-out infinite 2s; }
+  @keyframes placa { 0%, 72% { background-position: 130% 0; } 100% { background-position: -30% 0; } }
 
   /* o céu escurece e clareia devagar, do topo para o horizonte */
   .anoitecer { inset: 0; opacity: 0;
@@ -662,7 +663,7 @@
 <header class="ceu hero" id="topo">
   <div class="cena cena-foto" aria-hidden="true">
     <div class="paisagem">
-      <img src="hero.webp" width="1672" height="941" alt="" fetchpriority="high">
+      <img src="hero-2ri.webp" width="1672" height="941" alt="" fetchpriority="high">
       <div class="agua"></div>
       <div class="cintilas"><i></i><i></i><i></i></div>
       <div class="no-sol luz-sol"></div>
@@ -671,7 +672,7 @@
       <div class="fantasmas"><i class="g1"></i><i class="g2"></i></div>
       <div class="no-radio cone"></div>
       <div class="no-radio batida"></div>
-      <div class="no-radio dial"></div>
+      <div class="no-radio placa"></div>
       <div class="no-radio antena"></div>
     </div>
     <svg class="filtros" aria-hidden="true" focusable="false">
