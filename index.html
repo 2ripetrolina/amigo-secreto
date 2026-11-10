@@ -9,6 +9,33 @@
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#17124f">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<!-- Google Tag Manager (GA4 configurado dentro dele). Só carrega depois do "Ok" no aviso de cookies;
+     a escolha fica salva neste aparelho. Nada do que a pessoa escreve (nomes, presentes, perguntas, links, código) é enviado. -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  (function () {
+    var CHAVE = 'amigo-secreto-2026:analytics';
+    window.lerConsentimento = function () { try { return localStorage.getItem(CHAVE); } catch (e) { return null; } };
+    window.gravarConsentimento = function (v) { try { localStorage.setItem(CHAVE, v); } catch (e) { /* sem armazenamento: vale só nesta visita */ } };
+    window.carregarGTM = function () {
+      if (window.gtmCarregado) return;
+      window.gtmCarregado = true;
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-TFLZKQFX');
+    };
+    // eventos do site: só o tipo da ação (e números), nunca o conteúdo
+    window.rastrear = function (evento, dados) {
+      if (!window.gtmCarregado) return;
+      var o = { event: 'as_' + evento }; for (var k in dados || {}) o[k] = dados[k];
+      window.dataLayer.push(o);
+    };
+    if (window.lerConsentimento() === 'sim') window.carregarGTM();
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Boldonse&family=Stack+Sans+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -782,6 +809,17 @@
   .rodape { background: var(--areia); padding: 56px 0 64px; text-align: center; color: var(--ardosia); }
   .rodape .display { color: var(--navy); font-size: clamp(16px, 2.6vw, 24px); margin: 0 0 12px; line-height: 1.5; }
   .rodape p { margin: 0 auto 20px; max-width: 560px; font-size: 15px; }
+  .rodape .rodape-cookies { margin: 22px 0 0; }
+  .link-cookies { background: none; border: 0; padding: 4px; font: 500 13px var(--texto); color: var(--ardosia); text-decoration: underline; cursor: pointer; }
+
+  /* aviso de cookies: cartão discreto no rodapé da tela, só até a pessoa escolher */
+  .aviso-cookies { position: fixed; z-index: 50; left: 50%; bottom: 16px; translate: -50% 0; width: min(560px, calc(100% - 32px));
+                   display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; padding: 14px 16px;
+                   background: var(--branco); color: var(--navy); border-radius: 10px;
+                   box-shadow: 0 10px 30px rgba(0, 25, 65, .28), inset 0 0 0 1px rgba(0, 25, 65, .08); }
+  .aviso-cookies[hidden] { display: none; }
+  .aviso-cookies p { flex: 1 1 260px; margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--ardosia); }
+  .aviso-cookies-botoes { display: flex; gap: 8px; margin-left: auto; }
 </style>
 </head>
 <body>
@@ -1289,8 +1327,18 @@
     <p class="display">Feliz amigo secreto! 🎁</p>
     <p>As sugestões ficam guardadas numa planilha da organização. Você pode editar ou apagar as suas neste mesmo aparelho.</p>
     <button class="btn claro" id="btn-atualizar">Atualizar a lista</button>
+    <p class="rodape-cookies"><button type="button" class="link-cookies" id="abrir-cookies">Preferências de cookies</button></p>
   </div>
 </footer>
+
+<div class="aviso-cookies" id="aviso-cookies" role="region" aria-label="Aviso de cookies" hidden>
+  <p>🍪 Usamos o Google Analytics só para contar acessos e ver quais partes do site são usadas.
+     Nada do que você escreve aqui (nomes, presentes, perguntas) é enviado.</p>
+  <div class="aviso-cookies-botoes">
+    <button type="button" class="btn pequeno claro sem-seta" id="cookies-nao">Não, obrigado</button>
+    <button type="button" class="btn pequeno sem-seta" id="cookies-ok">Ok</button>
+  </div>
+</div>
 
 <script>
 // ══════════════════════════════════════════════════════════════
@@ -1445,7 +1493,7 @@ async function entrar(ev) {
   portaoMsg('Verificando…');
   await carregar(false);
   $('btn-entrar').disabled = false;
-  if (E.liberado) $('f-codigo').value = '';
+  if (E.liberado) { $('f-codigo').value = ''; rastrear('entrou_codigo'); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1608,6 +1656,7 @@ async function apagar(p) {
     esquecerChave(p.id);
     if (E.editando && E.editando.id === p.id) limparForm();
     mensagem('Sugestão apagada.', 'ok');
+    rastrear('sugestao_apagada');
     await carregar(true);
   } catch (e) {
     alert(e.message);
@@ -1681,6 +1730,7 @@ async function enviar(ev) {
       const antes = daPessoa(nome).map((x) => x.id).join();
       if (nova.map((x) => x.id).join() !== antes) await salvarOrdem(nova, nome);
     }
+    rastrear(editou ? 'sugestao_editada' : 'sugestao_enviada', { qtd_links: links.length });
     limparForm();
     $('f-nome').value = nome;
     mensagem(editou ? 'Sugestão atualizada! ✨'
@@ -1953,7 +2003,7 @@ function itemPergunta(q, souEu) {
       const r = txt.value.trim();
       if (!r) { txt.focus(); return; }
       btn.disabled = true; btn.textContent = 'Enviando…';
-      try { await api({ acao: 'responder', id: q.id, resposta: r, prova: provaDe(q.para) }); await carregar(true); }
+      try { await api({ acao: 'responder', id: q.id, resposta: r, prova: provaDe(q.para) }); rastrear('pergunta_respondida'); await carregar(true); }
       catch (e) { msg.textContent = e.message; btn.disabled = false; btn.textContent = 'Responder'; }
     });
     filhos.push(el('div', { class: 'responder' }, [txt, el('div', { class: 'acoes' }, [btn, botaoApagarPergunta(q), msg])]));
@@ -1999,6 +2049,7 @@ async function enviarPergunta(ev) {
   btn.disabled = true; btn.textContent = 'Enviando…';
   try {
     await api({ acao: 'perguntar', para: para, pergunta: texto });
+    rastrear('pergunta_enviada');
     fecharPergunta();
     await carregar(true);
     const alvo = $('pessoa-' + normalizar(para).replace(/[^a-z0-9]+/g, '-'));
@@ -2053,6 +2104,7 @@ async function entrarComPin(ev) {
     const r = await api({ acao: 'entrar', nome: nome, pin: pin });
     guardarAcesso(r.nome, r.token);
     gravarLocal(ULTIMO_NOME, r.nome);
+    rastrear('entrou_pin');
     fecharAcesso();
     depoisDoAcesso(r.nome);
   } catch (e) {
@@ -2077,6 +2129,7 @@ async function salvarPin(ev) {
     guardarAcesso(r.nome, r.token);
     $('pin-novo').value = ''; $('pin-conf').value = '';
     $('a-sair').hidden = false;
+    rastrear('pin_criado');
     acessoMsg('PIN salvo! Em outro celular ou navegador, toque em “🔑 Meu acesso” e entre com ele.', 'ok');
     render();
   } catch (e) {
@@ -2124,7 +2177,23 @@ $('foto-previa').addEventListener('error', () => {
 let espera;
 $('busca').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(render, 200); });
 $('filtro-pessoa').addEventListener('change', render);
-$('btn-novidades').addEventListener('click', () => { soNovidades = !soNovidades; render(); });
+$('btn-novidades').addEventListener('click', () => { soNovidades = !soNovidades; render(); if (soNovidades) rastrear('filtro_novidades'); });
+
+// ── aviso de cookies / Google Analytics ─────────────────────────
+(function cookies() {
+  const aviso = $('aviso-cookies');
+  if (!window.lerConsentimento()) aviso.hidden = false;
+  $('cookies-ok').addEventListener('click', () => { window.gravarConsentimento('sim'); aviso.hidden = true; window.carregarGTM(); });
+  $('cookies-nao').addEventListener('click', () => { window.gravarConsentimento('nao'); aviso.hidden = true; });
+  $('abrir-cookies').addEventListener('click', () => { aviso.hidden = false; $('cookies-ok').focus(); });
+  // links das lojas e "Salvar na agenda": conta só o clique (o endereço não vai junto)
+  document.addEventListener('click', (ev) => {
+    const a = ev.target.closest && ev.target.closest('a');
+    if (!a) return;
+    if (a.classList.contains('ver-loja')) rastrear('link_loja');
+    else if (a.href.indexOf('calendar.google.com') >= 0) rastrear('salvar_agenda');
+  });
+})();
 
 $('portao').addEventListener('submit', entrar);
 
