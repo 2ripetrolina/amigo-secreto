@@ -171,11 +171,31 @@
   .fantasmas .g2 { left: 63.5%; top: 42.4%; width: 7.5%;
                    background: radial-gradient(closest-side, rgba(170, 200, 255, .03) 50%, rgba(200, 190, 255, .08) 86%, transparent 100%); }
 
-  /* ── água: cópia da foto recortada na lâmina d'água e ondulada por um filtro SVG ── */
+  /* ── água: cópia da foto ondulada por um filtro SVG, recortada por uma máscara feita pixel a pixel
+        (só a lâmina d'água: o capim e as pedras ficam de fora e não ondulam) ── */
   .agua { inset: 0; background: url("hero-2ri.webp") 0 0 / 100% 100% no-repeat; filter: url(#ondas);
-          clip-path: polygon(0 74.5%, 26% 74.5%, 29% 72.4%, 31.6% 68.6%, 68.2% 68.6%, 68.2% 76.9%, 57.4% 79.5%, 49.6% 85%, 41.9% 87.4%,
-                             33.5% 89.8%, 27.5% 88.2%, 25.1% 85.9%, 10.8% 86.3%, 6% 89.3%, 0 90.3%);
-          -webkit-mask-image: linear-gradient(transparent 68.8%, #000 72.5%); mask-image: linear-gradient(transparent 68.8%, #000 72.5%); }
+          -webkit-mask: url("agua-mascara.webp") 0 0 / 100% 100% no-repeat; mask: url("agua-mascara.webp") 0 0 / 100% 100% no-repeat; }
+
+  /* ── vento: algumas folhas soltando da árvore e descendo pela colina, girando ── */
+  .folhas { inset: 0; }
+  .folhas > b { position: absolute; inset: 0; opacity: 0; animation: folha-voo var(--t) cubic-bezier(.3, .1, .6, 1) infinite var(--d); }
+  .folhas i { position: absolute; left: var(--x); top: var(--y); width: var(--s, .65%); aspect-ratio: 2.3 / 1; border-radius: 0 100% 0 100%;
+              background: linear-gradient(135deg, var(--c, #b5c46a) 0%, #6f8a3e 45%, #3e5a2e 100%);
+              box-shadow: .5px -.5px 0 rgba(255, 196, 140, .55);
+              animation: folha-gira var(--g, 2.4s) linear infinite, folha-vira .8s ease-in-out infinite alternate; }
+  @keyframes folha-voo {
+    0% { translate: 0 0; opacity: 0; }
+    4% { opacity: .95; }
+    16% { translate: calc(var(--dx) * .3) calc(var(--dy) * .1); }
+    30% { translate: calc(var(--dx) * .52) calc(var(--dy) * .3); }
+    40% { translate: calc(var(--dx) * .58) calc(var(--dy) * .48); }
+    52% { translate: calc(var(--dx) * .82) calc(var(--dy) * .72); }
+    58% { opacity: .85; }
+    64% { translate: var(--dx) var(--dy); opacity: 0; }
+    100% { translate: var(--dx) var(--dy); opacity: 0; }
+  }
+  @keyframes folha-gira { to { rotate: 360deg; } }
+  @keyframes folha-vira { from { scale: 1 1; } to { scale: .3 1; } }
   .filtros { position: absolute; width: 0; height: 0; overflow: hidden; }
   /* brilhos piscando no caminho do sol sobre a água */
   .cintilas { left: 24.5%; top: 69%; width: 14%; height: 19%; mix-blend-mode: screen;
@@ -720,6 +740,13 @@
       <img src="hero-2ri.webp" width="1672" height="941" alt="" fetchpriority="high">
       <div class="agua"></div>
       <div class="cintilas"><i></i><i></i><i></i></div>
+      <div class="folhas">
+        <b style="--t:17s;--d:-2s;--dx:6%;--dy:24%"><i style="--x:9%;--y:40%;--g:2.2s"></i></b>
+        <b style="--t:22s;--d:-11s;--dx:8%;--dy:27%"><i style="--x:14%;--y:34%;--g:3s;--c:#d8b860"></i></b>
+        <b style="--t:19s;--d:-6s;--dx:5%;--dy:20%"><i style="--x:18%;--y:43%;--g:1.8s;--s:.55%"></i></b>
+        <b style="--t:25s;--d:-17s;--dx:6%;--dy:23%"><i style="--x:20%;--y:38%;--g:2.6s;--c:#e0b468"></i></b>
+        <b style="--t:21s;--d:-14s;--dx:7%;--dy:21%"><i style="--x:5%;--y:44%;--g:2s;--s:.5%"></i></b>
+      </div>
       <div class="no-sol luz-sol"></div>
       <div class="no-sol nucleo"></div>
       <div class="no-sol risco"></div>
