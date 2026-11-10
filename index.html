@@ -136,13 +136,6 @@
   }
   @keyframes piscar { from { opacity: .18; } to { opacity: 1; } }
 
-  .cadente { top: 11%; left: 68%; width: 130px; height: 1.5px; border-radius: 2px; opacity: 0; rotate: -23deg;
-             background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0)); animation: cadente 13s linear infinite 4s; }
-  @keyframes cadente {
-    0%, 91% { opacity: 0; translate: 0 0; } 92.5% { opacity: 1; }
-    97% { opacity: 0; translate: -300px 127px; } 100% { opacity: 0; translate: -300px 127px; }
-  }
-
   /* hero: foto do entardecer com o rádio, presa ao rodapé; o topo se desfaz no céu.
      Tudo dentro de .paisagem usa % da própria imagem, então acompanha o sol e o rádio em qualquer tela. */
   .cena-foto { --foto-h: max(56.28vw, 520px); }
@@ -289,22 +282,45 @@
   .anoitecer { inset: 0; opacity: 0;
                background: linear-gradient(180deg, rgba(11, 10, 51, .9) 0%, rgba(40, 20, 110, .5) 42%, rgba(110, 30, 120, .14) 74%, rgba(110, 30, 120, 0) 100%);
                animation: crepusculo 28s ease-in-out infinite alternate; }
-  .cena-foto .estrelas { height: 44%; }
-  /* estrelas cadentes: cabeça brilhante e cauda longa, riscando o céu de tempos em tempos */
-  .cena-foto .cadente { top: 9%; left: 74%; width: clamp(150px, 17vw, 260px); height: 2px; rotate: -24deg; transform-origin: 0 50%;
-                        background: linear-gradient(90deg, #fff 0%, rgba(255, 244, 220, .9) 6%, rgba(220, 200, 255, .45) 35%, rgba(200, 180, 255, 0) 100%);
-                        filter: drop-shadow(0 0 4px rgba(255, 240, 220, .9)); animation: cadente-ceu 11s cubic-bezier(.35, 0, .65, 1) infinite 3s; }
-  .cena-foto .cadente::before { content: ""; position: absolute; left: -4px; top: 50%; width: 9px; height: 9px; translate: 0 -50%; border-radius: 50%;
-                                background: radial-gradient(closest-side, #fff 30%, rgba(255, 236, 200, .6) 60%, transparent);
-                                box-shadow: 0 0 12px 4px rgba(255, 240, 215, .75); }
-  .cena-foto .cadente.c2 { top: 24%; left: 34%; width: clamp(110px, 12vw, 190px); rotate: -23deg; animation-duration: 16s; animation-delay: 9.5s; }
-  @keyframes cadente-ceu {
-    0%, 88% { opacity: 0; translate: 0 0; scale: .4 1; }
-    89.5% { opacity: 1; scale: 1 1; }
-    95% { opacity: .9; }
-    97% { opacity: 0; translate: -36vw 15vw; scale: .7 1; }
-    100% { opacity: 0; translate: -36vw 15vw; }
-  }
+  /* céu do hero: poeira de estrelas fixa + camadas cintilando em ritmos irregulares (nunca o céu inteiro junto)
+     + algumas estrelas mais fortes, com halo e raios de difração finos. Ficam mais visíveis quando o céu escurece. */
+  .cena-foto .estrelas { height: 46%; mix-blend-mode: screen;
+                         -webkit-mask-image: linear-gradient(#000 0%, rgba(0,0,0,.85) 45%, transparent 100%); mask-image: linear-gradient(#000 0%, rgba(0,0,0,.85) 45%, transparent 100%); }
+  .cena-foto .estrelas::before { content: ""; position: absolute; inset: 0; animation: ceu-acende 28s ease-in-out infinite alternate;
+    background-image:
+      radial-gradient(circle at 9% 21%, rgba(255,255,255,.7) 0, transparent .9px), radial-gradient(circle at 27% 63%, rgba(255,255,255,.55) 0, transparent .8px),
+      radial-gradient(circle at 44% 12%, rgba(240,236,255,.65) 0, transparent 1px), radial-gradient(circle at 61% 48%, rgba(255,255,255,.5) 0, transparent .8px),
+      radial-gradient(circle at 78% 79%, rgba(255,246,230,.6) 0, transparent .9px), radial-gradient(circle at 93% 33%, rgba(255,255,255,.55) 0, transparent .8px),
+      radial-gradient(circle at 16% 88%, rgba(230,236,255,.5) 0, transparent .8px), radial-gradient(circle at 71% 7%, rgba(255,255,255,.65) 0, transparent .9px);
+    background-size: 211px 173px; }
+  .cena-foto .estrelas i { animation: cintila 7s linear infinite; }
+  /* pontos redondos com borda suave (gradiente em círculo), em vez de pixels duros */
+  .cena-foto .estrelas i:nth-child(1) { animation-duration: 5.3s; background-size: 373px 289px;
+    background-image:
+      radial-gradient(circle at 12% 18%, #fff 0, rgba(255,255,255,.55) .7px, transparent 1.5px), radial-gradient(circle at 67% 9%, #fff 0, rgba(255,255,255,.5) .6px, transparent 1.3px),
+      radial-gradient(circle at 38% 62%, #fff 0, rgba(255,255,255,.55) .8px, transparent 1.6px), radial-gradient(circle at 88% 47%, #fff 0, rgba(255,255,255,.45) .6px, transparent 1.3px),
+      radial-gradient(circle at 54% 86%, #fff 0, rgba(255,255,255,.45) .6px, transparent 1.3px); }
+  .cena-foto .estrelas i:nth-child(2) { animation-duration: 8.1s; animation-delay: -3.7s; background-size: 491px 359px;
+    background-image:
+      radial-gradient(circle at 24% 34%, #fff6e6 0, rgba(255,233,196,.55) .8px, transparent 1.6px), radial-gradient(circle at 79% 22%, #fff 0, rgba(255,255,255,.5) .6px, transparent 1.3px),
+      radial-gradient(circle at 51% 71%, #fff 0, rgba(255,255,255,.55) .9px, transparent 1.7px), radial-gradient(circle at 7% 83%, #f6efff 0, rgba(233,216,255,.5) .6px, transparent 1.4px); }
+  .cena-foto .estrelas i:nth-child(3) { animation-duration: 11.3s; animation-delay: -6.2s; background-size: 613px 449px;
+    background-image:
+      radial-gradient(circle at 31% 14%, #fff 0, rgba(255,255,255,.6) 1px, transparent 2px), radial-gradient(circle at 83% 58%, #fff6e6 0, rgba(255,233,196,.55) 1px, transparent 1.9px),
+      radial-gradient(circle at 58% 40%, #fff 0, rgba(255,255,255,.55) .9px, transparent 1.8px); }
+  @keyframes cintila { 0% { opacity: .45; } 14% { opacity: .95; } 27% { opacity: .6; } 41% { opacity: 1; } 58% { opacity: .5; }
+                       72% { opacity: .9; } 86% { opacity: .65; } 100% { opacity: .45; } }
+  @keyframes ceu-acende { 0%, 12% { opacity: .55; } 88%, 100% { opacity: 1; } }
+  /* estrelas fortes: núcleo, halo colorido e raios finos que cintilam cada uma no seu tempo */
+  .astro { position: absolute; left: var(--x); top: var(--y); width: var(--s, 2.4px); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%;
+           background: #fff; color: var(--c, rgba(225, 232, 255, .6));
+           box-shadow: 0 0 2px 1px rgba(255, 255, 255, .85), 0 0 calc(var(--s, 2.4px) * 4) calc(var(--s, 2.4px) * 1.2) currentColor;
+           animation: astro var(--t, 4s) ease-in-out infinite var(--d, 0s); }
+  .astro::before, .astro::after { content: ""; position: absolute; left: 50%; top: 50%; width: calc(var(--s, 2.4px) * 9); height: 1px; translate: -50% -50%;
+           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55) 42%, #fff 50%, rgba(255, 255, 255, .55) 58%, transparent); }
+  .astro::after { rotate: 90deg; width: calc(var(--s, 2.4px) * 7); }
+  @keyframes astro { 0%, 100% { opacity: .55; scale: .8; } 22% { opacity: 1; scale: 1.12; } 30% { opacity: .75; scale: .95; }
+                     48% { opacity: .95; scale: 1.05; } 70% { opacity: .6; scale: .85; } }
 
   /* nuvens finas iluminadas, atravessando devagar */
   .faixa { height: 14px; width: 44vw; min-width: 280px; border-radius: 99px; filter: blur(5px); opacity: .7;
@@ -317,23 +333,9 @@
   .faixa.f4 { right: 8%; bottom: 330px; width: 26vw; height: 8px; opacity: .6; animation-duration: 80s; animation-delay: -45s; }
   @keyframes faixa { from { translate: -9vw 0; } to { translate: 9vw 0; } }
 
-  /* revoada cruzando o céu */
-  .revoada { left: 0; bottom: 380px; width: clamp(90px, 11vw, 150px); height: auto; overflow: visible;
-             fill: none; stroke: #1a1147; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: .72;
-             animation: revoada 46s linear infinite; }
-  .revoada.r2 { bottom: 520px; width: clamp(60px, 7vw, 96px); opacity: .5; animation-duration: 64s; animation-delay: -27s; }
-  .revoada path { transform-box: fill-box; transform-origin: center; animation: asa .62s ease-in-out infinite alternate; }
-  .revoada path:nth-child(2n) { animation-delay: -.21s; }
-  .revoada path:nth-child(3n) { animation-delay: -.43s; }
-  @keyframes revoada { from { translate: -22vw 30px; } to { translate: 112vw -90px; } }
-  @keyframes asa { from { scale: 1 1; } to { scale: .88 .25; } }
-
-  .cena-foto .revoada { bottom: calc(var(--foto-h) * .56); }
-  .cena-foto .revoada.r2 { bottom: calc(var(--foto-h) * .74); }
   @media (max-width: 700px) { .paisagem { --fx: .2; } .faixa { filter: blur(4px); } }
   @media (prefers-reduced-motion: reduce) {
     .nuvem, .nuvem-alta, .cena::before, .cena::after, .cena * { animation: none !important; }
-    .revoada, .cadente { display: none; }
   }
 
   /* ── hero ───────────────────────────────────────────────────── */
@@ -633,6 +635,13 @@
   .selo-corpo h4 { margin: 0; font: 700 16px/1.3 var(--texto); overflow-wrap: anywhere; padding-right: 54px; }
   .selo-corpo p { margin: 0; color: var(--ardosia); font-size: 14px; overflow-wrap: anywhere; white-space: pre-line; }
   .selo-meu { font: 700 10px var(--texto); letter-spacing: .08em; text-transform: uppercase; color: #b45309; }
+  /* sugestão com 2+ links: etiqueta de combo no canto inferior da foto */
+  .selo-combo { position: absolute; left: 6px; bottom: 6px; z-index: 1; display: inline-flex; align-items: center; gap: 5px;
+                font: 800 10.5px/1 var(--texto); letter-spacing: .06em; text-transform: uppercase; color: #fff;
+                padding: 5px 9px 5px 7px; border-radius: 99px; background: linear-gradient(135deg, #e8590c, #c2255c);
+                box-shadow: 0 1px 3px rgba(0, 25, 65, .35), inset 0 0 0 1px rgba(255, 255, 255, .25); }
+  .selo-combo::before { content: ""; width: 12px; height: 12px; flex: none;
+    background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='13' rx='1.5'/%3E%3Cpath d='M12 8v13M3 12h18M12 8c-1.5-4-6-4.5-6-2s3 2 6 2c3 0 6 .5 6-2s-4.5-2-6 2'/%3E%3C/svg%3E"); }
   .selo-rodape { margin-top: auto; padding-top: 8px; display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; border-top: 1px dashed var(--linha); }
   .ver-loja { font: 700 13px var(--texto); color: var(--celeste); text-decoration: none; }
   /* ordem de preferência */
@@ -820,10 +829,17 @@
         </g>
       </g>
     </svg>
-    <div class="estrelas"><i></i><i></i><i></i></div>
-    <div class="cadente"></div><div class="cadente c2"></div>
-    <svg class="revoada" viewBox="0 0 150 70"><path d="M2 40q7-9 13-1 6-8 13 1"/><path d="M38 22q7-9 13-1 6-8 13 1"/><path d="M48 56q6-8 11-1 5-7 11 1"/><path d="M82 10q7-9 13-1 6-8 13 1"/><path d="M96 44q6-8 11-1 5-7 11 1"/><path d="M124 26q6-8 11-1 5-7 11 1"/></svg>
-    <svg class="revoada r2" viewBox="0 0 150 70"><path d="M10 34q7-9 13-1 6-8 13 1"/><path d="M52 14q7-9 13-1 6-8 13 1"/><path d="M70 50q6-8 11-1 5-7 11 1"/><path d="M112 30q6-8 11-1 5-7 11 1"/></svg>
+    <div class="estrelas"><i></i><i></i><i></i>
+      <b class="astro" style="--x:7%;--y:14%;--s:2.6px;--t:4.6s;--d:-1.2s"></b>
+      <b class="astro" style="--x:18%;--y:38%;--s:1.8px;--t:3.7s;--d:-2.9s;--c:rgba(255,226,190,.55)"></b>
+      <b class="astro" style="--x:29%;--y:9%;--s:2.1px;--t:5.4s;--d:-.4s;--c:rgba(205,215,255,.6)"></b>
+      <b class="astro" style="--x:41%;--y:27%;--s:1.6px;--t:4.1s;--d:-3.3s"></b>
+      <b class="astro" style="--x:52%;--y:6%;--s:2.9px;--t:6.2s;--d:-2s;--c:rgba(215,205,255,.6)"></b>
+      <b class="astro" style="--x:63%;--y:33%;--s:1.7px;--t:3.9s;--d:-1.6s;--c:rgba(255,230,200,.5)"></b>
+      <b class="astro" style="--x:74%;--y:15%;--s:2.2px;--t:5s;--d:-4.1s"></b>
+      <b class="astro" style="--x:88%;--y:25%;--s:1.9px;--t:4.4s;--d:-.9s;--c:rgba(200,220,255,.6)"></b>
+      <b class="astro" style="--x:95%;--y:7%;--s:2.4px;--t:5.8s;--d:-3s"></b>
+    </div>
   </div>
   <div class="container">
     <h1 class="display">
@@ -1602,7 +1618,8 @@ function cartaoPresente(p, minhas, posicao, total, podeOrdenar) {
   return el('article', { class: 'selo' + (meu ? ' meu' : '') }, [
     el('div', { class: 'selo-papel' }, [el('div', { class: 'selo-miolo' }, [
       el('div', { class: 'selo-topo' }, [
-        el('div', { class: 'selo-img' }, [imagem, medalha, el('span', { class: 'valor-selo', text: '2026' })]),
+        el('div', { class: 'selo-img' }, [imagem, medalha, el('span', { class: 'valor-selo', text: '2026' }),
+          links.length > 1 ? el('span', { class: 'selo-combo', title: links.length + ' itens nesta sugestão', text: 'Combo · ' + links.length + ' itens' }) : null]),
         carimbo(p.criadoEm),
       ]),
       el('div', { class: 'selo-corpo' }, [
