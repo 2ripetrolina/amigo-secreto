@@ -671,6 +671,19 @@
                 box-shadow: 0 1px 3px rgba(0, 25, 65, .35), inset 0 0 0 1px rgba(255, 255, 255, .25); }
   .selo-combo::before { content: ""; width: 12px; height: 12px; flex: none;
     background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='8' width='18' height='13' rx='1.5'/%3E%3Cpath d='M12 8v13M3 12h18M12 8c-1.5-4-6-4.5-6-2s3 2 6 2c3 0 6 .5 6-2s-4.5-2-6 2'/%3E%3C/svg%3E"); }
+  /* novidade desde a última visita deste aparelho: etiqueta acima do nome do presente */
+  .selo-novo { align-self: flex-start; display: inline-flex; align-items: center; gap: 5px;
+               font: 800 10px/1 var(--texto); letter-spacing: .07em; text-transform: uppercase; color: #fff;
+               padding: 4px 8px 4px 7px; border-radius: 99px; background: linear-gradient(135deg, #2b8a3e, #0ca678);
+               box-shadow: 0 1px 3px rgba(0, 25, 65, .35), inset 0 0 0 1px rgba(255, 255, 255, .25); }
+  .selo-novo.alterado { background: linear-gradient(135deg, #1864ab, #4263eb); }
+  .selo-novo::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; flex: none;
+                       box-shadow: 0 0 0 0 rgba(255, 255, 255, .7); animation: novo-pulso 2.4s ease-out infinite; }
+  @keyframes novo-pulso { 0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .7); } 70%, 100% { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); } }
+  .selo:has(.selo-novo) .selo-papel { outline: 2px solid rgba(12, 166, 120, .55); outline-offset: 3px; }
+  .selo:has(.selo-novo.alterado) .selo-papel { outline-color: rgba(66, 99, 235, .5); }
+  #btn-novidades[aria-pressed="true"] { background: var(--amarelo); border-color: var(--amarelo); color: var(--navy); }
+  @media (prefers-reduced-motion: reduce) { .selo-novo::before { animation: none; } }
   .selo-rodape { margin-top: auto; padding-top: 8px; display: flex; align-items: center; gap: 4px 12px; flex-wrap: wrap; border-top: 1px dashed var(--linha); }
   .ver-loja { font: 700 13px var(--texto); color: var(--celeste); text-decoration: none; }
   /* ordem de preferência */
@@ -1147,6 +1160,8 @@
       <div class="ferramentas">
         <input type="search" id="busca" placeholder="Buscar presente ou pessoa…" aria-label="Buscar">
         <select id="filtro-pessoa" aria-label="Filtrar por pessoa"><option value="">Todas as pessoas</option></select>
+        <button type="button" class="btn pequeno sem-seta" id="btn-novidades" aria-pressed="false" hidden
+                title="Sugestões novas ou alteradas desde a sua última visita">✨ Novidades <b id="qtd-novidades"></b></button>
         <button type="button" class="btn pequeno sem-seta" id="btn-perguntar">💬 Pergunta anônima</button>
         <button type="button" class="btn pequeno claro sem-seta" id="btn-acesso">🔑 Meu acesso</button>
       </div>
@@ -1205,6 +1220,38 @@ const meusAcessos = () => lerLocal(ACESSO, {}) || {};
 const tokenDe = (nome) => meusAcessos()[nome] || '';
 function guardarAcesso(nome, token) { const a = meusAcessos(); a[nome] = token; gravarLocal(ACESSO, a); }
 
+// ── novidades: o que mudou desde a última visita NESTE aparelho ──
+// Guarda uma "digital" de cada sugestão vista. Uma visita nova começa depois de 1h sem abrir o site;
+// até lá as etiquetas continuam (recarregar a página não apaga). Na primeira visita nada é novidade.
+const VISTOS = 'amigo-secreto-2026:vistos';
+const NOVA_VISITA = 60 * 60 * 1000;
+let baseVistos;                 // undefined = ainda não leu; null = primeira visita; objeto = { id: digital }
+let soNovidades = false;
+function digital(p) {
+  const s = [p.presente, p.link, p.detalhes, p.imagem].join('\u0001');
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+function registrarVistos() {
+  const agora = Date.now();
+  if (baseVistos === undefined) {
+    const salvo = lerLocal(VISTOS, null);
+    baseVistos = !salvo || !salvo.ids ? null
+      : agora - (Number(salvo.t) || 0) > NOVA_VISITA ? salvo.ids
+      : (salvo.base || null);
+  }
+  const ids = {};
+  E.pedidos.forEach((p) => { ids[p.id] = digital(p); });
+  gravarLocal(VISTOS, { t: agora, ids: ids, base: baseVistos });
+}
+// 'novo' | 'alterado' | '' (as próprias sugestões nunca contam)
+function novidade(p, minhas) {
+  if (!baseVistos || minhas[p.id] || tokenDe(p.nome)) return '';
+  if (!(p.id in baseVistos)) return 'novo';
+  return baseVistos[p.id] !== digital(p) ? 'alterado' : '';
+}
+
 // ══════════════════════════════════════════════════════════════
 // API
 // ══════════════════════════════════════════════════════════════
@@ -1236,6 +1283,7 @@ async function carregar(silencioso) {
     E.participantes = j.participantes || [];
     E.pedidos = j.pedidos || [];
     E.perguntas = j.perguntas || [];
+    registrarVistos();
     liberar();
     montarNomes();
     render();
@@ -1633,6 +1681,7 @@ const opcaoTxt = (n) => n + 'ª opção';
 
 function cartaoPresente(p, minhas, posicao, total, podeOrdenar) {
   const meu = !!minhas[p.id] || !!tokenDe(p.nome);
+  const nov = novidade(p, minhas);
   const imagem = p.imagem
     ? el('img', { src: p.imagem, alt: p.presente, loading: 'lazy', referrerpolicy: 'no-referrer',
                   onerror: (ev) => { ev.target.replaceWith(usarSvg('i-presente', 'presente-svg', '0 0 120 120')); } })
@@ -1670,6 +1719,9 @@ function cartaoPresente(p, minhas, posicao, total, podeOrdenar) {
       ]),
       el('div', { class: 'selo-corpo' }, [
         meu ? el('span', { class: 'selo-meu', text: '★ Sua sugestão' }) : null,
+        nov ? el('span', { class: 'selo-novo' + (nov === 'alterado' ? ' alterado' : ''),
+                           title: nov === 'novo' ? 'Sugestão nova desde a sua última visita' : 'Sugestão alterada desde a sua última visita',
+                           text: nov === 'novo' ? 'Novo' : 'Alterado' }) : null,
         el('h4', { text: p.presente }),
         p.detalhes ? el('p', { text: p.detalhes }) : null,
         rodape,
@@ -1700,8 +1752,14 @@ function render() {
   const termo = normalizar($('busca').value.trim());
   const pessoa = $('filtro-pessoa').value;
   const minhas = minhasChaves();
+  const qtdNov = E.pedidos.filter((p) => novidade(p, minhas)).length;
+  if (!qtdNov) soNovidades = false;
+  $('btn-novidades').hidden = !qtdNov;
+  $('btn-novidades').setAttribute('aria-pressed', String(soNovidades));
+  $('qtd-novidades').textContent = qtdNov ? '(' + qtdNov + ')' : '';
   const lista = E.pedidos.filter((p) =>
     (!pessoa || p.nome === pessoa) &&
+    (!soNovidades || novidade(p, minhas)) &&
     (!termo || normalizar(p.nome + ' ' + p.presente + ' ' + p.detalhes).indexOf(termo) >= 0));
 
   // aviso de perguntas esperando resposta de quem usa este aparelho
@@ -1716,7 +1774,7 @@ function render() {
   const grupos = new Map();
   const grupo = (n) => { if (!grupos.has(n)) grupos.set(n, []); return grupos.get(n); };
   lista.forEach((p) => grupo(p.nome).push(p));
-  if (!termo) E.perguntas.forEach((q) => { if (!pessoa || q.para === pessoa) grupo(q.para); });
+  if (!termo && !soNovidades) E.perguntas.forEach((q) => { if (!pessoa || q.para === pessoa) grupo(q.para); });
 
   if (!grupos.size) {
     mural(E.pedidos.length || E.perguntas.length
@@ -1961,6 +2019,7 @@ $('foto-previa').addEventListener('error', () => {
 let espera;
 $('busca').addEventListener('input', () => { clearTimeout(espera); espera = setTimeout(render, 200); });
 $('filtro-pessoa').addEventListener('change', render);
+$('btn-novidades').addEventListener('click', () => { soNovidades = !soNovidades; render(); });
 
 $('portao').addEventListener('submit', entrar);
 
