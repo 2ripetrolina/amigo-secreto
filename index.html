@@ -143,27 +143,52 @@
     97% { opacity: 0; translate: -300px 127px; } 100% { opacity: 0; translate: -300px 127px; }
   }
 
-  /* sol: clarão, raios girando devagar e disco listrado afundando nas nuvens */
-  .clarao { left: 50%; bottom: 0; width: max(150%, 1100px); height: 620px; translate: -50% 0;
-            background: radial-gradient(50% 78% at 50% 100%, rgba(255, 214, 140, .62) 0%, rgba(255, 150, 110, .32) 38%, rgba(255, 110, 140, 0) 72%);
-            animation: clarao 9s ease-in-out infinite alternate; }
-  @keyframes clarao { from { opacity: .72; } to { opacity: 1; } }
-  .raios { left: 50%; bottom: calc(var(--sol-base) + var(--sol) / 2); width: calc(var(--sol) * 3.4); aspect-ratio: 1; margin: 0 0 calc(var(--sol) * -1.7) calc(var(--sol) * -1.7);
-           border-radius: 50%; opacity: .55;
-           background: repeating-conic-gradient(rgba(255, 226, 160, .22) 0deg 7deg, rgba(255, 226, 160, 0) 7deg 20deg);
-           -webkit-mask-image: radial-gradient(closest-side, #000 22%, transparent 100%); mask-image: radial-gradient(closest-side, #000 22%, transparent 100%);
-           animation: raios 140s linear infinite; }
-  @keyframes raios { to { rotate: 360deg; } }
-  .sol-halo { left: 50%; bottom: calc(var(--sol-base) + var(--sol) / 2); width: calc(var(--sol) * 1.9); aspect-ratio: 1; margin: 0 0 calc(var(--sol) * -.95) calc(var(--sol) * -.95);
-              border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 236, 170, .75) 46%, rgba(255, 176, 120, .32) 66%, rgba(255, 140, 130, 0) 100%);
-              animation: halo 6s ease-in-out infinite alternate; }
-  @keyframes halo { from { scale: .94; opacity: .7; } to { scale: 1.06; opacity: 1; } }
-  .sol { left: 50%; bottom: var(--sol-base); width: var(--sol); aspect-ratio: 1; margin-left: calc(var(--sol) / -2); border-radius: 50%;
-         background: linear-gradient(180deg, #fff6c2 0%, #ffd766 26%, #ff9d5c 60%, #ff5c8d 100%);
-         -webkit-mask-image: linear-gradient(#000 0 54%, transparent 54% 56.5%, #000 56.5% 64%, transparent 64% 67.5%, #000 67.5% 74%, transparent 74% 78.5%, #000 78.5% 84%, transparent 84% 89.5%, #000 89.5% 93%, transparent 93%);
-                 mask-image: linear-gradient(#000 0 54%, transparent 54% 56.5%, #000 56.5% 64%, transparent 64% 67.5%, #000 67.5% 74%, transparent 74% 78.5%, #000 78.5% 84%, transparent 84% 89.5%, #000 89.5% 93%, transparent 93%);
-         animation: sol 14s ease-in-out infinite alternate; }
-  @keyframes sol { from { translate: 0 -6px; } to { translate: 0 12px; } }
+  /* hero: foto do entardecer com o rádio, presa ao rodapé; o topo se desfaz no céu.
+     Tudo dentro de .paisagem usa % da própria imagem, então acompanha o sol e o rádio em qualquer tela. */
+  .cena-foto { --foto-h: max(56.28vw, 520px); }
+  .cena-foto::before { content: none; }
+  .paisagem { --w: max(100%, 924px); --fx: 0;
+          left: calc((100% - var(--w)) * var(--fx)); bottom: -2px; width: var(--w); aspect-ratio: 1672 / 941;
+          -webkit-mask-image: linear-gradient(transparent 0, #000 17%); mask-image: linear-gradient(transparent 0, #000 17%);
+          transform-origin: 31% 62%; animation: foto-zoom 38s ease-in-out infinite alternate; will-change: scale; }
+  .paisagem > * { position: absolute; }
+  .paisagem img { inset: 0; display: block; width: 100%; height: 100%; }
+  @keyframes foto-zoom { from { scale: 1; } to { scale: 1.07; } }
+
+  /* sol pulsando */
+  .brilho { left: 31.1%; top: 59.3%; width: 32%; aspect-ratio: 1; margin: -16% 0 0 -16%; border-radius: 50%; mix-blend-mode: screen;
+            background: radial-gradient(closest-side, rgba(255, 244, 190, .6) 0 19%, rgba(255, 190, 120, .3) 46%, rgba(255, 150, 130, 0) 100%);
+            animation: halo 6s ease-in-out infinite alternate; }
+  @keyframes halo { from { scale: .9; opacity: .55; } to { scale: 1.08; opacity: 1; } }
+
+  /* reflexo do sol tremulando na água */
+  .reflexo { left: 24.5%; top: 69.4%; width: 14%; height: 17%; mix-blend-mode: screen; opacity: .75;
+             background: repeating-linear-gradient(180deg, rgba(255, 246, 200, 0) 0 5px, rgba(255, 246, 200, .6) 5px 7px, rgba(255, 246, 200, 0) 7px 13px);
+             -webkit-mask-image: radial-gradient(50% 62% at 50% 28%, #000 0, transparent 100%); mask-image: radial-gradient(50% 62% at 50% 28%, #000 0, transparent 100%);
+             animation: reflexo 2.6s linear infinite; }
+  @keyframes reflexo { to { background-position: 0 26px; } }
+
+  /* rádio tocando: ondas saindo do alto-falante e notas subindo */
+  .onda { left: 72.4%; top: 71.6%; width: 6.4%; aspect-ratio: 1; margin: -3.2% 0 0 -3.2%; border-radius: 50%; opacity: 0;
+          border: 2px solid rgba(255, 220, 160, .85); animation: onda 3s ease-out infinite; }
+  .onda.o2 { animation-delay: -1.5s; }
+  @keyframes onda { 0% { scale: .55; opacity: 0; } 18% { opacity: .8; } 100% { scale: 1.9; opacity: 0; } }
+  .nota { left: 74%; top: 54%; opacity: 0; font: 700 clamp(17px, 2.3vw, 32px)/1 var(--texto); color: #fff6d8;
+          text-shadow: 0 0 12px rgba(255, 150, 110, .95), 0 1px 2px rgba(60, 20, 90, .5); animation: nota 7s ease-in infinite; }
+  .nota.n2 { left: 80%; top: 52%; animation-duration: 8.6s; animation-delay: -2.6s; }
+  .nota.n3 { left: 86%; top: 55%; animation-duration: 6.4s; animation-delay: -4.8s; }
+  @keyframes nota {
+    0% { translate: 0 0; rotate: -10deg; opacity: 0; } 14% { opacity: .95; }
+    50% { translate: 16px -70px; rotate: 10deg; } 80% { opacity: .5; }
+    100% { translate: -8px -150px; rotate: -8deg; opacity: 0; }
+  }
+
+  /* o céu escurece e clareia devagar, do topo para o horizonte */
+  .anoitecer { inset: 0; opacity: 0;
+               background: linear-gradient(180deg, rgba(11, 10, 51, .9) 0%, rgba(40, 20, 110, .5) 42%, rgba(110, 30, 120, .14) 74%, rgba(110, 30, 120, 0) 100%);
+               animation: crepusculo 28s ease-in-out infinite alternate; }
+  .cena-foto .estrelas { height: 44%; }
+  .cena-foto .cadente { left: 62%; }
 
   /* nuvens finas iluminadas, atravessando devagar */
   .faixa { height: 14px; width: 44vw; min-width: 280px; border-radius: 99px; filter: blur(5px); opacity: .7;
@@ -187,14 +212,16 @@
   @keyframes revoada { from { translate: -22vw 30px; } to { translate: 112vw -90px; } }
   @keyframes asa { from { scale: 1 1; } to { scale: .88 .25; } }
 
-  @media (max-width: 700px) { .cena { --sol-base: 96px; } .faixa { filter: blur(4px); } }
+  .cena-foto .revoada { bottom: calc(var(--foto-h) * .56); }
+  .cena-foto .revoada.r2 { bottom: calc(var(--foto-h) * .74); }
+  @media (max-width: 700px) { .paisagem { --fx: .2; } .faixa { filter: blur(4px); } }
   @media (prefers-reduced-motion: reduce) {
     .nuvem, .nuvem-alta, .cena::before, .cena::after, .cena * { animation: none !important; }
     .revoada, .cadente { display: none; }
   }
 
   /* ── hero ───────────────────────────────────────────────────── */
-  .hero { text-align: center; padding: 72px 0 340px; }
+  .hero { text-align: center; padding: 72px 0 340px; background: linear-gradient(180deg, #0a3c9a 0%, #1186d9 46%, #1186d9 100%); }
   .hero > .container { position: relative; z-index: 1; }
   .hero h1, .hero .lema { text-shadow: 0 2px 22px rgba(23, 12, 79, .35); }
   .hero h1 { margin: 0; font-size: clamp(30px, 10.5vw, 128px); line-height: 1.24; }
@@ -236,7 +263,7 @@
   .portao-linha:focus-within { box-shadow: 0 0 0 3px var(--amarelo), 0 10px 30px -10px rgba(0, 25, 65, .45); }
   .portao-msg { margin: 12px 0 0; text-align: center; font-size: 14px; opacity: .95; min-height: 1.6em; }
   .portao-msg.erro { color: var(--navy); background: var(--amarelo); border-radius: 6px; padding: 6px 10px; opacity: 1; }
-  .voador { position: absolute; width: clamp(110px, 16vw, 210px); right: 7%; bottom: 70px; z-index: 2; animation: flutuar 5s ease-in-out infinite; }
+  .voador { position: absolute; width: clamp(110px, 14vw, 190px); right: 5%; bottom: calc(max(56.28vw, 520px) * .5); z-index: 2; animation: flutuar 5s ease-in-out infinite; }
   @keyframes flutuar { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-14px) rotate(-2deg); } }
   @media (prefers-reduced-motion: reduce) { .voador { animation: none; } html { scroll-behavior: auto; } }
   @media (max-width: 700px) { .voador { right: 4%; bottom: 120px; } .hero { padding-bottom: 310px; } }
@@ -350,6 +377,14 @@
   .campo { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
   .campo label, .campo .rot { font: 700 11px/1.2 var(--texto); letter-spacing: .06em; text-transform: uppercase; color: var(--azul); }
   .campo .opcional { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--aco); }
+  .link-linha { display: flex; gap: 6px; }
+  .link-linha input { flex: 1; min-width: 0; }
+  .link-x { flex: none; width: 42px; border: 1px solid var(--linha); border-radius: 8px; background: var(--branco); color: #c2410c;
+            cursor: pointer; font: 700 14px/1 var(--texto); }
+  .link-x:hover { background: #fff1e8; }
+  #links-extra { display: flex; flex-direction: column; gap: 6px; }
+  #links-extra:empty { display: none; }
+  #link-mais { align-self: flex-start; }
   .link-status { margin: 2px 0 0; font: 500 12.5px/1.4 var(--texto); color: var(--ardosia); }
   .link-status.ok { color: var(--verde); }
   .link-status.buscando::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 7px; vertical-align: -1px;
@@ -549,14 +584,17 @@
 </nav>
 
 <header class="ceu hero" id="topo">
-  <div class="cena" aria-hidden="true">
+  <div class="cena cena-foto" aria-hidden="true">
+    <div class="paisagem">
+      <img src="hero.webp" width="1672" height="941" alt="" fetchpriority="high">
+      <div class="brilho"></div>
+      <div class="reflexo"></div>
+      <div class="onda"></div><div class="onda o2"></div>
+      <span class="nota">♪</span><span class="nota n2">♫</span><span class="nota n3">♪</span>
+    </div>
+    <div class="anoitecer"></div>
     <div class="estrelas"><i></i><i></i><i></i></div>
     <div class="cadente"></div>
-    <div class="clarao"></div>
-    <div class="raios"></div>
-    <div class="sol-halo"></div>
-    <div class="sol"></div>
-    <div class="faixa f1"></div><div class="faixa f2"></div><div class="faixa f3"></div><div class="faixa f4"></div>
     <svg class="revoada" viewBox="0 0 150 70"><path d="M2 40q7-9 13-1 6-8 13 1"/><path d="M38 22q7-9 13-1 6-8 13 1"/><path d="M48 56q6-8 11-1 5-7 11 1"/><path d="M82 10q7-9 13-1 6-8 13 1"/><path d="M96 44q6-8 11-1 5-7 11 1"/><path d="M124 26q6-8 11-1 5-7 11 1"/></svg>
     <svg class="revoada r2" viewBox="0 0 150 70"><path d="M10 34q7-9 13-1 6-8 13 1"/><path d="M52 14q7-9 13-1 6-8 13 1"/><path d="M70 50q6-8 11-1 5-7 11 1"/><path d="M112 30q6-8 11-1 5-7 11 1"/></svg>
   </div>
@@ -615,15 +653,6 @@
       <path d="M190 58c26-30 30-52 16-56-8 18-20 32-36 44z" fill="#fff" opacity=".95"/>
     </g>
   </svg>
-
-  <div class="nuvens" aria-hidden="true">
-    <svg class="nuvem rosa" style="left:-2%;bottom:70px;width:300px"><use href="#i-nuvem"/></svg>
-    <svg class="nuvem" style="left:-4%;bottom:0;width:380px;height:150px"><use href="#i-nuvem"/></svg>
-    <svg class="nuvem lilas" style="left:30%;bottom:40px;width:240px"><use href="#i-nuvem"/></svg>
-    <svg class="nuvem" style="left:44%;bottom:-6px;width:460px;height:170px"><use href="#i-nuvem"/></svg>
-    <svg class="nuvem rosa" style="right:2%;bottom:80px;width:260px"><use href="#i-nuvem"/></svg>
-    <svg class="nuvem" style="right:-6%;bottom:-4px;width:340px;height:140px"><use href="#i-nuvem"/></svg>
-  </div>
 </header>
 
 <section class="convite" id="festa" aria-labelledby="convite-titulo">
@@ -701,7 +730,7 @@
       <div>
         <p><strong>A lista</strong> é aberta: todo mundo vê o que todo mundo pediu, e quem te tirou acerta no presente.</p>
         <p><strong>O sorteio</strong> é secreto: só você sabe quem tirou, então nada de entregar o jogo por aqui.</p>
-        <p><strong>O presente</strong>, sem erro: mande até 6 ideias, com link da loja, foto e detalhes como tamanho e cor.</p>
+        <p><strong>O presente</strong>, sem erro: mande até 6 ideias, com link da loja (ou vários, se for um combo), foto e detalhes como tamanho e cor.</p>
         <p class="valor-aviso"><strong>Valor mínimo: R$ 150,00.</strong> Sugira presentes a partir desse valor.</p>
       </div>
     </div>
@@ -724,8 +753,10 @@
           <select id="f-pref"></select>
         </div>
         <div class="campo">
-          <label for="f-link">Link da loja <span class="opcional">(opcional)</span></label>
+          <label for="f-link">Link da loja <span class="opcional">(opcional · é um combo? adicione um link por item)</span></label>
           <input type="url" id="f-link" inputmode="url" placeholder="Cole o link: nome e foto vêm sozinhos ✨">
+          <div id="links-extra"></div>
+          <button type="button" class="link-btn" id="link-mais">+ Adicionar outro link</button>
           <p class="link-status" id="link-status" role="status" hidden></p>
         </div>
         <div class="campo">
@@ -994,7 +1025,7 @@ function mensagem(texto, tipo) {
 function limparForm() {
   E.editando = null; E.foto = null; E.removerFoto = false;
   E.fotoLoja = null; E.presenteAuto = ''; E.linkBuscado = ''; statusLink('');
-  $('f-presente').value = ''; $('f-link').value = ''; $('f-detalhes').value = '';
+  $('f-presente').value = ''; definirLinks([]); $('f-detalhes').value = '';
   $('f-foto').value = '';
   $('f-nome').disabled = false;
   $('form-titulo').textContent = 'Sua sugestão';
@@ -1015,7 +1046,35 @@ function mostrarFoto(src, daLoja) {
   $('foto-loja').hidden = !(src && daLoja);
 }
 
-// ── prévia pelo link da loja ───────────────────────────────────
+// ── vários links por sugestão (combo): guardados juntos, um por linha ──
+const MAX_LINKS = 5;
+const LINK_OK = /^https?:\/\/[^\s\/]+\.[^\s]{2,}$/i;
+function arrumarLink(v) {
+  v = String(v || '').replace(/\s+/g, '');
+  return v && !/^https?:\/\//i.test(v) ? 'https://' + v : v;
+}
+function linksDe(texto) { return String(texto || '').split(/\s+/).filter((x) => /^https?:\/\//i.test(x)); }
+function camposLink() { return [$('f-link'), ...$('links-extra').querySelectorAll('input')]; }
+function lerLinks() { return [...new Set(camposLink().map((c) => arrumarLink(c.value)).filter(Boolean))]; }
+function ajustarLinks() { $('link-mais').hidden = camposLink().length >= MAX_LINKS; }
+function linhaLink(valor) {
+  const campo = el('input', { type: 'url', inputmode: 'url', placeholder: 'Link de outro item do combo', 'aria-label': 'Link de outro item' });
+  campo.value = valor || '';
+  const linha = el('div', { class: 'link-linha' }, [campo,
+    el('button', { type: 'button', class: 'link-x', text: '✕', title: 'Remover este link', 'aria-label': 'Remover este link',
+                   onclick: () => { linha.remove(); ajustarLinks(); } })]);
+  $('links-extra').append(linha);
+  ajustarLinks();
+  return campo;
+}
+function definirLinks(lista) {
+  $('f-link').value = lista[0] || '';
+  $('links-extra').textContent = '';
+  lista.slice(1, MAX_LINKS).forEach(linhaLink);
+  ajustarLinks();
+}
+
+// ── prévia pelo link da loja (usa o primeiro link) ─────────────
 function statusLink(texto, tipo) {
   const s = $('link-status');
   s.textContent = texto || '';
@@ -1054,10 +1113,11 @@ async function buscarPrevia() {
 
 function editar(p) {
   E.editando = p; E.foto = null; E.removerFoto = false;
-  E.fotoLoja = null; E.presenteAuto = ''; E.linkBuscado = String(p.link || ''); statusLink('');
+  const links = linksDe(p.link);
+  E.fotoLoja = null; E.presenteAuto = ''; E.linkBuscado = links[0] || ''; statusLink('');
   $('f-nome').value = p.nome; $('f-nome').disabled = true;
   $('f-presente').value = p.presente;
-  $('f-link').value = p.link;
+  definirLinks(links);
   $('f-detalhes').value = p.detalhes;
   $('f-foto').value = '';
   mostrarFoto(p.imagem || null);
@@ -1112,13 +1172,14 @@ async function enviar(ev) {
   if (E.enviando) return;
   const nome = $('f-nome').value;
   const presente = $('f-presente').value.trim();
-  let link = $('f-link').value.trim();
-  if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+  const links = lerLinks();
   if (!nome) { mensagem('Escolha seu nome na lista.', 'erro'); $('f-nome').focus(); return; }
   if (!presente) { mensagem('Diga o que você gostaria de ganhar.', 'erro'); $('f-presente').focus(); return; }
+  const ruim = camposLink().find((c) => c.value.trim() && !LINK_OK.test(arrumarLink(c.value)));
+  if (ruim) { mensagem('Confira este link: ele precisa ser o endereço completo da loja.', 'erro'); ruim.focus(); return; }
 
   const dados = {
-    presente: presente, link: link, detalhes: $('f-detalhes').value.trim(),
+    presente: presente, link: links.join(' '), detalhes: $('f-detalhes').value.trim(),
     imagem: E.foto ? { base64: E.foto.base64, tipo: E.foto.tipo } : null,
     imagemLoja: !E.foto && E.fotoLoja ? E.fotoLoja : null,
   };
@@ -1258,10 +1319,10 @@ function cartaoPresente(p, minhas, posicao, total, podeOrdenar) {
     ? el('img', { src: p.imagem, alt: p.presente, loading: 'lazy', referrerpolicy: 'no-referrer',
                   onerror: (ev) => { ev.target.replaceWith(usarSvg('i-presente', 'presente-svg', '0 0 120 120')); } })
     : usarSvg('i-presente', 'presente-svg', '0 0 120 120');
+  const links = linksDe(p.link);
   const rodape = el('div', { class: 'selo-rodape' }, [
-    /^https?:\/\//i.test(p.link)
-      ? el('a', { class: 'ver-loja', href: p.link, target: '_blank', rel: 'noopener noreferrer nofollow', text: 'Ver na loja' })
-      : null,
+    ...links.map((u, i) => el('a', { class: 'ver-loja', href: u, target: '_blank', rel: 'noopener noreferrer nofollow',
+                                     text: links.length > 1 ? 'Item ' + (i + 1) : 'Ver na loja' })),
     meu ? el('button', { type: 'button', class: 'link-btn', text: 'Editar', onclick: () => editar(p) }) : null,
     meu ? el('button', { type: 'button', class: 'link-btn perigo', text: 'Apagar', onclick: () => apagar(p) }) : null,
     podeOrdenar ? el('span', { class: 'ordem-btns' }, [
@@ -1484,6 +1545,8 @@ $('f-foto').addEventListener('change', async (ev) => {
   ev.target.value = '';
 });
 $('foto-remover').addEventListener('click', () => { E.foto = null; E.fotoLoja = null; E.removerFoto = true; mostrarFoto(null); });
+
+$('link-mais').addEventListener('click', () => linhaLink('').focus());
 
 // colou/digitou o link → busca nome e foto (com uma pausa para não buscar a cada tecla)
 let esperaLink;
