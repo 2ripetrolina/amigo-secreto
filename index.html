@@ -211,14 +211,16 @@
   .cena.pausado, .cena.pausado::before, .cena.pausado::after,
   .cena.pausado *, .cena.pausado *::before, .cena.pausado *::after { animation-play-state: paused !important; }
 
-  /* ── vento: algumas folhas soltando da árvore e descendo pela colina, girando ── */
+  /* ── cerejeira: as copas da árvore recoloridas em flor (mesmo traço, luz e sombra do desenho), só na área da árvore ── */
+  .cerejeira { left: 0; top: 24.017%; width: 25%; height: 36.026%; background: url("cerejeira.webp") 0 0 / 100% 100% no-repeat; }
+
+  /* ── vento: algumas pétalas soltando da cerejeira e descendo pela colina, girando ── */
   .folhas { inset: 0; }
   .folhas > b { position: absolute; inset: 0; opacity: 0; animation: folha-voo var(--t) cubic-bezier(.3, .1, .6, 1) infinite var(--d); }
-  .folhas i { position: absolute; left: var(--x); top: var(--y); width: var(--s, .65%); aspect-ratio: 2.3 / 1; border-radius: 0 100% 0 100%;
-              background: linear-gradient(135deg, var(--c, #b5c46a) 0%, #6f8a3e 45%, #3e5a2e 100%);
-              box-shadow: .5px -.5px 0 rgba(255, 196, 140, .55);
-              animation: folha-gira var(--g, 2.4s) linear infinite, folha-vira .8s ease-in-out infinite alternate; }
-  @keyframes folha-voo {
+  .folhas i { position: absolute; left: var(--x); top: var(--y); width: var(--s, .62%); aspect-ratio: 1;
+              background: url("petala.svg") center / contain no-repeat;
+              filter: drop-shadow(0 .5px .5px rgba(90, 30, 60, .25));
+              animation: folha-gira var(--g, 2.4s) linear infinite, folha-vira var(--v, .9s) ease-in-out infinite alternate; }  @keyframes folha-voo {
     0% { translate: 0 0; opacity: 0; }
     4% { opacity: .95; }
     16% { translate: calc(var(--dx) * .3) calc(var(--dy) * .1); }
@@ -786,16 +788,20 @@
   <div class="cena cena-foto" aria-hidden="true">
     <div class="paisagem">
       <img src="hero-2ri.webp" width="1672" height="941" alt="" fetchpriority="high">
+      <div class="cerejeira"></div>
       <div class="agua"></div>
       <div class="reflexo-sol"><i class="rs-coluna"></i><i class="rs-nucleo"></i><i class="rs-linhas"></i><i class="rs-linhas l2"></i></div>
       <div class="capim"></div>
       <div class="cintilas"><i></i><i></i><i></i></div>
       <div class="folhas">
         <b style="--t:17s;--d:-2s;--dx:6%;--dy:24%"><i style="--x:9%;--y:40%;--g:2.2s"></i></b>
-        <b style="--t:22s;--d:-11s;--dx:8%;--dy:27%"><i style="--x:14%;--y:34%;--g:3s;--c:#d8b860"></i></b>
-        <b style="--t:19s;--d:-6s;--dx:5%;--dy:20%"><i style="--x:18%;--y:43%;--g:1.8s;--s:.55%"></i></b>
-        <b style="--t:25s;--d:-17s;--dx:6%;--dy:23%"><i style="--x:20%;--y:38%;--g:2.6s;--c:#e0b468"></i></b>
+        <b style="--t:22s;--d:-11s;--dx:8%;--dy:27%"><i style="--x:14%;--y:34%;--g:3.4s;--v:1.3s;--s:.66%"></i></b>
+        <b style="--t:19s;--d:-6s;--dx:5%;--dy:20%"><i style="--x:18%;--y:43%;--g:1.8s;--s:.52%"></i></b>
+        <b style="--t:25s;--d:-17s;--dx:13%;--dy:31%"><i style="--x:20%;--y:38%;--g:2.6s;--v:.7s"></i></b>
         <b style="--t:21s;--d:-14s;--dx:7%;--dy:21%"><i style="--x:5%;--y:44%;--g:2s;--s:.5%"></i></b>
+        <b style="--t:23s;--d:-8s;--dx:16%;--dy:33%"><i style="--x:11%;--y:36%;--g:4s;--v:1.5s;--s:.54%"></i></b>
+        <b style="--t:18s;--d:-15s;--dx:9%;--dy:26%"><i style="--x:16%;--y:39%;--g:2.1s;--v:.8s;--s:.56%"></i></b>
+        <b style="--t:27s;--d:-21s;--dx:11%;--dy:29%"><i style="--x:7%;--y:35%;--g:2.9s;--s:.58%"></i></b>
       </div>
       <div class="no-sol luz-sol"></div>
       <div class="no-sol nucleo"></div>
