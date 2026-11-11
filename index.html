@@ -486,8 +486,7 @@
   .prazo-fechado .icone { font-size: 34px; }
   .prazo-fechado p { margin: 8px 0 0; color: var(--ardosia); }
   .prazo-fechado .btn { margin-top: 16px; }
-  .encerrado #form, .encerrado #btn-perguntar, .encerrado #btn-acesso, .encerrado #alerta-perguntas,
-  .encerrado .nav-links a[href="#enviar"] { display: none !important; }
+  .encerrado #form, .encerrado .nav-links a[href="#enviar"] { display: none !important; }
   .evento-rotulo { display: inline-block; font: 700 10px/1 var(--texto); letter-spacing: .08em; text-transform: uppercase;
                    background: var(--amarelo); color: var(--navy); border-radius: 4px; padding: 5px 7px; margin-right: 10px; vertical-align: 2px; }
   .contagem { display: flex; justify-content: center; gap: clamp(8px, 2vw, 14px); margin-top: 16px; }
@@ -687,6 +686,28 @@
   .pergunta .responder textarea { min-height: 44px; font-size: 15px; }
   .pergunta .acoes { display: flex; gap: 6px 12px; flex-wrap: wrap; align-items: center; }
   .pergunta .apagar-q { margin: 4px 0 0 19px; }
+  /* curtidas: coração no canto da pergunta (um por aparelho; clicar de novo desfaz) */
+  .pergunta { position: relative; padding-right: 64px; }
+  .curtir { position: absolute; top: 7px; right: 8px; display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px 3px 7px;
+            border: 0; border-radius: 99px; background: var(--creme); box-shadow: inset 0 0 0 1px var(--linha); cursor: pointer;
+            font: 700 12.5px/1.2 var(--texto); color: var(--ardosia); transition: background .2s, color .2s, box-shadow .2s; }
+  .curtir:hover { box-shadow: inset 0 0 0 1px #f2a7c4; }
+  .curtir:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+  .curtir .coracao { position: relative; display: inline-block; width: 16px; height: 16px; }
+  .curtir .coracao svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2.2; transition: fill .2s, stroke .2s; }
+  .curtir.curti { background: #ffe8f0; color: #d6336c; box-shadow: inset 0 0 0 1px #f7b9cf; }
+  .curtir.curti .coracao svg { fill: #e64980; stroke: #d6336c; }
+  .curtir.pulou .coracao svg { animation: coracao-pula .5s cubic-bezier(.3, 1.6, .5, 1); }
+  @keyframes coracao-pula { 0% { scale: .6; } 45% { scale: 1.35; } 100% { scale: 1; } }
+  /* mini corações que sobem ao curtir */
+  .curtir .coracao i { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -3.5px; pointer-events: none; opacity: 0;
+                       background: #e64980; clip-path: path("M3.5 7 0.6 4.1A1.8 1.8 0 0 1 3.5 1.4 1.8 1.8 0 0 1 6.4 4.1Z"); }
+  .curtir.pulou .coracao i { animation: coracao-sobe .8s ease-out forwards; }
+  .curtir.pulou .coracao i:nth-child(2) { --dx: -14px; animation-delay: .04s; }
+  .curtir.pulou .coracao i:nth-child(3) { --dx: 12px; animation-delay: .1s; background: #f783ac; }
+  .curtir.pulou .coracao i:nth-child(4) { --dx: 2px; animation-delay: .16s; background: var(--amarelo); }
+  @keyframes coracao-sobe { 0% { opacity: 1; translate: 0 0; scale: .6; } 100% { opacity: 0; translate: var(--dx, -4px) -26px; scale: 1.1; } }
+  @media (prefers-reduced-motion: reduce) { .curtir.pulou .coracao svg, .curtir.pulou .coracao i { animation: none; } }
   .pessoa .sem-sugestao { font-size: 14px; opacity: .9; margin: -6px 0 0; }
   .dlg { border: 0; border-radius: 10px; padding: 22px 22px 18px; width: min(92vw, 460px); background: var(--creme); color: var(--navy);
          box-shadow: 0 30px 60px -20px rgba(0, 25, 65, .6); }
@@ -1268,7 +1289,7 @@
       <div class="icone" aria-hidden="true">🔒</div>
       <h2 class="display">Lista fechada</h2>
       <p>O prazo para mandar e alterar sugestões terminou na quinta, 12/11, às 23:59.
-         A lista continua aberta para consulta: é só escolher o presente de quem você tirou. 🎁</p>
+         A lista continua aberta para consulta, e as perguntas anônimas seguem valendo: dá para perguntar, responder e curtir. 🎁</p>
       <a class="btn" href="#lista">Ver a lista</a>
     </div>
 
@@ -1493,7 +1514,7 @@ function novidade(p, minhas) {
 // O servidor também recusa as alterações depois do prazo e manda o horário dele (que vale mais que este, se mudar).
 const PRAZO = new Date('2026-11-12T23:59:59-03:00').getTime();   // horário de Petrolina (UTC-3)
 const MSG_PRAZO = 'O prazo para sugestões terminou na quinta, 12/11, às 23:59. A lista agora é só para consulta.';
-const ESCRITAS = ['criar', 'editar', 'apagar', 'reordenar', 'perguntar', 'responder', 'apagarPergunta', 'definirPin'];
+const ESCRITAS = ['criar', 'editar', 'apagar', 'reordenar'];      // perguntas, respostas, curtidas e PIN seguem abertos
 let prazoServidor = 0;
 const encerrado = () => Date.now() > (prazoServidor || PRAZO);
 function aplicarPrazo() {
@@ -1502,16 +1523,13 @@ function aplicarPrazo() {
   aplicarPrazo.estado = fim;
   document.body.classList.toggle('encerrado', fim);
   $('prazo-fechado').hidden = !fim;
-  $('prazo-hero').innerHTML = fim ? '🔒 Sugestões encerradas · <b>a lista segue aberta para consulta</b>'
+  $('prazo-hero').innerHTML = fim ? '🔒 Sugestões encerradas · <b>a lista e as perguntas seguem abertas</b>'
                                   : '⏰ Sugestões até <b>quinta, 12/11, às 23:59</b>';
   $('hero-btn').textContent = fim ? 'Ver a lista' : 'Enviar minha sugestão';
   $('hero-btn').setAttribute('href', fim ? '#lista' : '#enviar');
-  $('rodape-txt').textContent = fim ? 'As sugestões ficam guardadas numa planilha da organização. O prazo terminou: a lista agora é só para consulta.'
+  $('rodape-txt').textContent = fim ? 'As sugestões ficam guardadas numa planilha da organização. O prazo terminou: a lista agora é só para consulta, mas as perguntas seguem abertas.'
     : 'As sugestões ficam guardadas numa planilha da organização. Você pode editar ou apagar as suas neste mesmo aparelho.';
-  if (fim) {
-    ['dlg-pergunta', 'dlg-acesso'].forEach((id) => { const d = $(id); if (d.open) { if (d.close) d.close(); else d.removeAttribute('open'); } });
-    if (E.liberado) render();                       // tira os botões de editar/apagar/ordenar/responder dos cartões
-  }
+  if (fim && E.liberado) render();                  // tira os botões de editar/apagar/ordenar dos cartões
 }
 
 // o código do grupo vai em toda chamada; o servidor confere e recusa sem ele
@@ -2076,7 +2094,7 @@ function render() {
   // aviso de perguntas esperando resposta de quem usa este aparelho
   const meus = meusNomes();
   const pendentes = E.perguntas.filter((q) => meus.has(q.para) && !q.resposta);
-  $('alerta-perguntas').hidden = !pendentes.length || encerrado();
+  $('alerta-perguntas').hidden = !pendentes.length;
   $('alerta-perguntas-txt').textContent = pendentes.length === 1
     ? '📬 Você tem 1 pergunta anônima esperando resposta.'
     : '📬 Você tem ' + pendentes.length + ' perguntas anônimas esperando resposta.';
@@ -2133,15 +2151,74 @@ function provaDe(nome) {
   return p ? { id: p.id, chave: c[p.id] } : null;
 }
 
+// ── curtidas nas perguntas: uma por aparelho (identificador aleatório guardado aqui; o servidor só vê um hash dele).
+// O coração muda na hora e o servidor confirma a contagem; se falhar, volta como estava.
+const APARELHO = 'amigo-secreto-2026:aparelho';
+const CURTIDAS = 'amigo-secreto-2026:curtidas';
+let aparelhoMem = '';
+function idAparelho() {
+  if (aparelhoMem) return aparelhoMem;
+  let id = lerLocal(APARELHO, '');
+  if (!id) {
+    id = window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+    gravarLocal(APARELHO, id);
+  }
+  return (aparelhoMem = id);
+}
+const minhasCurtidas = () => lerLocal(CURTIDAS, {}) || {};
+function marcarCurtida(id, sim) { const m = minhasCurtidas(); if (sim) m[id] = 1; else delete m[id]; gravarLocal(CURTIDAS, m); }
+const CORACAO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.6l-1.3-1.2C6 15.1 3 12.4 3 8.9 3 6.1 5.2 4 7.9 4c1.6 0 3.1.7 4.1 1.9C13 4.7 14.5 4 16.1 4 18.8 4 21 6.1 21 8.9c0 3.5-3 6.2-7.7 10.5L12 20.6z"/></svg>';
+
+function botaoCurtir(q) {
+  const b = el('button', { type: 'button', class: 'curtir' });
+  const cor = document.createElement('span');
+  cor.className = 'coracao';
+  cor.innerHTML = CORACAO + '<i></i><i></i><i></i>';
+  const n = el('span', { class: 'n' });
+  b.append(cor, n);
+  const mostrar = () => {
+    const sim = !!minhasCurtidas()[q.id], total = Number(q.curtidas) || 0;
+    b.classList.toggle('curti', sim);
+    b.setAttribute('aria-pressed', String(sim));
+    n.textContent = total ? String(total) : '';
+    b.title = (sim ? 'Você curtiu' : 'Curtir') + (total ? ' · ' + total + (total === 1 ? ' curtida' : ' curtidas') : '');
+    b.setAttribute('aria-label', (sim ? 'Descurtir' : 'Curtir') + ' esta pergunta' + (total ? ', ' + total + (total === 1 ? ' curtida' : ' curtidas') : ''));
+  };
+  b.addEventListener('click', async () => {
+    if (b.dataset.ocupado) return;
+    const curtir = !minhasCurtidas()[q.id];
+    marcarCurtida(q.id, curtir);
+    q.curtidas = Math.max(0, (Number(q.curtidas) || 0) + (curtir ? 1 : -1));
+    mostrar();
+    if (curtir) { b.classList.remove('pulou'); void b.offsetWidth; b.classList.add('pulou'); }
+    b.dataset.ocupado = '1';
+    try {
+      const r = await api({ acao: 'curtir', id: q.id, curtir: curtir, quem: idAparelho() });
+      q.curtidas = Number(r.curtidas) || 0;
+      marcarCurtida(q.id, !!r.curti);
+      rastrear(curtir ? 'curtiu' : 'descurtiu');
+    } catch (e) {
+      marcarCurtida(q.id, !curtir);
+      q.curtidas = Math.max(0, (Number(q.curtidas) || 0) + (curtir ? -1 : 1));
+      b.classList.remove('pulou');
+      alert(e.message);
+    } finally {
+      delete b.dataset.ocupado;
+      mostrar();
+    }
+  });
+  mostrar();
+  return b;
+}
+
 function blocoPerguntas(nome, souEu) {
   const qs = E.perguntas.filter((q) => q.para === nome)
     .sort((a, b) => String(a.criadoEm).localeCompare(String(b.criadoEm)));
-  if (!qs.length && encerrado()) return null;                 // lista fechada: sem perguntas, nada a mostrar
   const cab = el('div', { class: 'perguntas-cab' }, [
     el('span', {}, qs.length
       ? [el('b', { text: '💬 ' + qs.length + (qs.length === 1 ? ' pergunta anônima' : ' perguntas anônimas') })]
       : [document.createTextNode(souEu ? 'Ninguém te perguntou nada ainda.' : 'Ficou com dúvida sobre o que ' + nome + ' quer?')]),
-    souEu || encerrado() ? null : el('button', { type: 'button', class: 'link-btn', text: 'Perguntar anonimamente', onclick: () => abrirPergunta(nome) }),
+    souEu ? null : el('button', { type: 'button', class: 'link-btn', text: 'Perguntar anonimamente', onclick: () => abrirPergunta(nome) }),
   ]);
   return el('div', { class: 'perguntas' }, [
     cab,
@@ -2150,11 +2227,9 @@ function blocoPerguntas(nome, souEu) {
 }
 
 function itemPergunta(q, souEu) {
-  const filhos = [el('p', { class: 'q', text: q.pergunta })];
+  const filhos = [botaoCurtir(q), el('p', { class: 'q', text: q.pergunta })];
   if (q.resposta) filhos.push(el('p', { class: 'r', text: q.resposta }));
-  if (encerrado()) {
-    if (!q.resposta) filhos.push(el('p', { class: 'espera', text: 'Ficou sem resposta.' }));
-  } else if (souEu && !q.resposta) {
+  if (souEu && !q.resposta) {
     const txt = el('textarea', { maxlength: '400', placeholder: 'Sua resposta (aparece para todo mundo)', 'aria-label': 'Resposta' });
     const btn = el('button', { type: 'button', class: 'btn pequeno', text: 'Responder' });
     const msg = el('span', { class: 'espera' });
