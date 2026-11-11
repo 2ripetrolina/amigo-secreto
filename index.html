@@ -714,8 +714,37 @@
   }
   .progresso-linha { display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; font-size: 15px; }
   .progresso-linha strong { font-family: var(--display); font-weight: 400; font-size: 14px; }
-  .barra { height: 10px; background: var(--papel); border-radius: 99px; margin: 12px 0 6px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--linha); }
-  .barra > span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--celeste), var(--rosa), var(--amarelo)); border-radius: 99px; transition: width .5s; }
+  /* barra de progresso: --p (registrada, para animar) move o preenchimento, a ponta brilhante e o rótulo da % juntos */
+  @property --p { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
+  .barra { --p: 0%; position: relative; height: 10px; background: var(--papel); border-radius: 99px; margin: 40px 0 6px; box-shadow: inset 0 0 0 1px var(--linha);
+           transition: --p 1.1s cubic-bezier(.22, .8, .3, 1); }
+  .barra > span { position: relative; display: block; height: 100%; width: var(--p); overflow: hidden; border-radius: 99px;
+                  background: linear-gradient(90deg, var(--celeste), var(--rosa), var(--amarelo)); }
+  /* reflexo que corre pelo preenchimento */
+  .barra > span::after { content: ""; position: absolute; inset: 0; width: 40%;
+                         background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .65) 50%, transparent);
+                         translate: -100% 0; animation: barra-brilho 2.8s ease-in-out infinite 1.2s; }
+  @keyframes barra-brilho { 0% { translate: -100% 0; } 60%, 100% { translate: 260% 0; } }
+  /* ponta: estrelinha que pulsa, com uma onda saindo dela */
+  .barra-ponta { position: absolute; top: 50%; left: var(--p); width: 18px; height: 18px; translate: -50% -50%; border-radius: 50%;
+                 background: radial-gradient(circle at 38% 35%, #fff 0 22%, #fff3c4 40%, var(--amarelo) 70%);
+                 box-shadow: 0 0 0 2px var(--branco), 0 0 10px 3px rgba(254, 210, 97, .9), 0 2px 6px rgba(0, 25, 65, .3);
+                 animation: ponta-pulsa 1.6s ease-in-out infinite; }
+  .barra-ponta::before, .barra-ponta::after { content: ""; position: absolute; inset: 0; border-radius: 50%;
+                 box-shadow: 0 0 0 2px var(--amarelo); opacity: 0; animation: ponta-onda 2.4s ease-out infinite; }
+  .barra-ponta::after { animation-delay: 1.2s; }
+  @keyframes ponta-pulsa { 0%, 100% { scale: 1; } 50% { scale: 1.18; } }
+  @keyframes ponta-onda { 0% { scale: 1; opacity: .9; } 100% { scale: 2.8; opacity: 0; } }
+  /* rótulo "50% concluído" acima da ponta; o deslocamento proporcional (-p da própria largura) o mantém dentro da barra
+     em 0% e 100% e centrado na ponta em 50% */
+  .barra-pct { position: absolute; bottom: calc(100% + 12px); left: var(--p); translate: calc(var(--p) * -1) 0;
+               padding: 3px 9px; border-radius: 99px; white-space: nowrap; background: var(--navy); color: var(--branco);
+               font: 700 12px/1.3 var(--texto); letter-spacing: .02em; box-shadow: 0 4px 10px -4px rgba(0, 25, 65, .5); }
+  .barra-pct strong { font: inherit; color: var(--amarelo); }
+  @media (prefers-reduced-motion: reduce) {
+    .barra { transition: none; }
+    .barra > span::after, .barra-ponta, .barra-ponta::before, .barra-ponta::after { animation: none; }
+  }
   details.faltam summary { cursor: pointer; color: var(--ardosia); font-size: 14px; margin-top: 6px; }
   .faltam-lista { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .chip { font: 600 12px var(--texto); padding: 4px 10px; border-radius: 99px; background: var(--branco); color: var(--ardosia); box-shadow: inset 0 0 0 1px var(--linha); }
@@ -1291,7 +1320,11 @@
         <span><strong id="qtd-enviaram">0</strong> de <strong id="qtd-total">0</strong> pessoas já mandaram sugestões</span>
         <span id="qtd-pedidos"></span>
       </div>
-      <div class="barra"><span id="barra"></span></div>
+      <div class="barra" id="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Pessoas que já mandaram sugestões">
+        <span></span>
+        <i class="barra-ponta" aria-hidden="true"></i>
+        <b class="barra-pct" id="barra-pct" aria-hidden="true"><strong>0%</strong> concluído</b>
+      </div>
       <details class="faltam" id="faltam" hidden>
         <summary>Quem ainda não enviou (<span id="qtd-faltam">0</span>)</summary>
         <div class="faltam-lista" id="faltam-lista"></div>
@@ -1898,7 +1931,11 @@ function render() {
   $('qtd-enviaram').textContent = enviaram.length;
   $('qtd-total').textContent = E.participantes.length;
   $('qtd-pedidos').textContent = nSug;
-  $('barra').style.width = (E.participantes.length ? 100 * enviaram.length / E.participantes.length : 0) + '%';
+  const pct = E.participantes.length ? 100 * enviaram.length / E.participantes.length : 0;
+  $('barra').style.setProperty('--p', pct + '%');
+  $('barra').setAttribute('aria-valuenow', Math.round(pct));
+  $('barra-pct').firstChild.textContent = Math.round(pct) + '%';
+  $('barra-pct').lastChild.textContent = pct >= 100 ? ' concluído 🎉' : ' concluído';
   $('faltam').hidden = !faltam.length;
   $('qtd-faltam').textContent = faltam.length;
   $('faltam-lista').replaceChildren(...faltam.map((n) => el('span', { class: 'chip', text: n })));
