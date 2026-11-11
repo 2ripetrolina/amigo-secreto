@@ -798,6 +798,38 @@
     .barra { transition: none; }
     .barra > span::after, .barra-ponta, .barra-ponta::before, .barra-ponta::after { animation: none; }
   }
+  /* "já comprei meu presente": contador anônimo (não diz qual presente nem para quem) */
+  .compras { display: flex; align-items: center; justify-content: space-between; gap: 10px 18px; flex-wrap: wrap;
+             margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--linha); font-size: 14.5px; }
+  .compras-info { flex: 1 1 220px; display: grid; gap: 6px; }
+  .compras-info b { font: 400 15px var(--display); }
+  .compras-barra { height: 6px; max-width: 320px; border-radius: 99px; background: var(--papel); box-shadow: inset 0 0 0 1px var(--linha); overflow: hidden; }
+  .compras-barra span { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, #7bc47f, var(--verde));
+                        transition: width .8s cubic-bezier(.22, .8, .3, 1); }
+  .btn-comprei { position: relative; border: 0; cursor: pointer; padding: 9px 16px; border-radius: 99px; white-space: nowrap;
+                 font: 700 14px/1.2 var(--texto); color: var(--navy); background: var(--amarelo);
+                 box-shadow: 0 3px 0 #d9a933, 0 6px 14px -6px rgba(0, 25, 65, .45); transition: background .2s, color .2s, box-shadow .2s, translate .1s; }
+  .btn-comprei:hover { translate: 0 -1px; }
+  .btn-comprei:active { translate: 0 2px; box-shadow: 0 1px 0 #d9a933; }
+  .btn-comprei:focus-visible { outline: 2px solid var(--celeste); outline-offset: 3px; }
+  .btn-comprei.feito { background: #e3f1e5; color: #1f5a2a; box-shadow: inset 0 0 0 1.5px #8cc795; }
+  .btn-comprei.pulou .rotulo { display: inline-block; animation: comprei-pula .55s cubic-bezier(.3, 1.6, .5, 1); }
+  @keyframes comprei-pula { 0% { scale: .8; } 45% { scale: 1.12; } 100% { scale: 1; } }
+  /* estouro de confete ao marcar */
+  .btn-comprei .estouro { position: absolute; left: 50%; top: 50%; pointer-events: none; }
+  .btn-comprei .estouro i { position: absolute; width: 7px; height: 7px; margin: -3.5px; border-radius: 2px; opacity: 0; background: var(--c, var(--amarelo)); }
+  .btn-comprei.pulou .estouro i { animation: comprei-confete .9s cubic-bezier(.2, .7, .4, 1) forwards; }
+  .btn-comprei .estouro i:nth-child(1) { --c: #e64980; --x: -70px; --y: -26px; }
+  .btn-comprei .estouro i:nth-child(2) { --c: var(--celeste); --x: -44px; --y: -40px; border-radius: 50%; }
+  .btn-comprei .estouro i:nth-child(3) { --c: var(--amarelo); --x: -12px; --y: -46px; }
+  .btn-comprei .estouro i:nth-child(4) { --c: #7bc47f; --x: 18px; --y: -44px; border-radius: 50%; }
+  .btn-comprei .estouro i:nth-child(5) { --c: var(--rosa); --x: 46px; --y: -36px; }
+  .btn-comprei .estouro i:nth-child(6) { --c: var(--laranja, #f08c3a); --x: 72px; --y: -22px; border-radius: 50%; }
+  .btn-comprei .estouro i:nth-child(7) { --c: var(--celeste); --x: -30px; --y: 26px; }
+  .btn-comprei .estouro i:nth-child(8) { --c: #e64980; --x: 34px; --y: 24px; border-radius: 50%; }
+  @keyframes comprei-confete { 0% { opacity: 1; translate: 0 0; rotate: 0deg; scale: .5; }
+                               70% { opacity: 1; } 100% { opacity: 0; translate: var(--x) var(--y); rotate: 220deg; scale: 1; } }
+  @media (prefers-reduced-motion: reduce) { .btn-comprei.pulou .rotulo, .btn-comprei.pulou .estouro i { animation: none; } .compras-barra span { transition: none; } }
   details.faltam summary { cursor: pointer; color: var(--ardosia); font-size: 14px; margin-top: 6px; }
   .faltam-lista { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .chip { font: 600 12px var(--texto); padding: 4px 10px; border-radius: 99px; background: var(--branco); color: var(--ardosia); box-shadow: inset 0 0 0 1px var(--linha); }
@@ -1398,6 +1430,16 @@
         <summary>Quem ainda não enviou (<span id="qtd-faltam">0</span>)</summary>
         <div class="faltam-lista" id="faltam-lista"></div>
       </details>
+      <div class="compras" id="compras">
+        <div class="compras-info">
+          <span><b id="qtd-comprados">0</b> de <b id="qtd-total-c">0</b> já compraram o presente 🛍️</span>
+          <div class="compras-barra" aria-hidden="true"><span id="compras-barra"></span></div>
+        </div>
+        <button type="button" class="btn-comprei" id="btn-comprei" aria-pressed="false">
+          <span class="rotulo">🎁 Já comprei o meu!</span>
+          <span class="estouro" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        </button>
+      </div>
       <div class="alerta-perguntas" id="alerta-perguntas" hidden>
         <span id="alerta-perguntas-txt"></span>
         <button type="button" class="btn pequeno" id="ir-perguntas">Responder</button>
@@ -1561,6 +1603,7 @@ async function carregar(silencioso) {
     E.participantes = j.participantes || [];
     E.pedidos = j.pedidos || [];
     E.perguntas = j.perguntas || [];
+    E.comprados = Number(j.comprados) || 0;
     if (Number(j.prazo) > 0) { prazoServidor = Number(j.prazo); aplicarPrazo(); }
     registrarVistos();
     liberar();
@@ -2075,6 +2118,7 @@ function render() {
   $('faltam').hidden = !faltam.length;
   $('qtd-faltam').textContent = faltam.length;
   Reboque.atualizar(faltam);
+  mostrarCompras();
   $('faltam-lista').replaceChildren(...faltam.map((n) => el('span', { class: 'chip', text: n })));
 
   // filtros
@@ -2210,6 +2254,47 @@ function botaoCurtir(q) {
   mostrar();
   return b;
 }
+
+// ── "já comprei meu presente": contador anônimo, uma marca por aparelho (mesmo identificador das curtidas).
+// Não guarda qual presente nem para quem, então não entrega o sorteio. Clicar de novo desmarca.
+const COMPREI = 'amigo-secreto-2026:comprei';
+function mostrarCompras() {
+  const sim = !!lerLocal(COMPREI, false);
+  const total = E.participantes.length;
+  const n = total ? Math.min(Number(E.comprados) || 0, total) : Number(E.comprados) || 0;
+  $('qtd-comprados').textContent = n;
+  $('qtd-total-c').textContent = total;
+  $('compras-barra').style.width = (total ? 100 * n / total : 0) + '%';
+  const b = $('btn-comprei');
+  b.classList.toggle('feito', sim);
+  b.setAttribute('aria-pressed', String(sim));
+  b.querySelector('.rotulo').textContent = sim ? '✅ Presente comprado!' : '🎁 Já comprei o meu!';
+  b.title = sim ? 'Clique para desmarcar' : 'Marca só que você já comprou, sem dizer o quê nem para quem';
+}
+$('btn-comprei').addEventListener('click', async () => {
+  const b = $('btn-comprei');
+  if (b.dataset.ocupado) return;
+  const comprei = !lerLocal(COMPREI, false);
+  if (!comprei && !confirm('Desmarcar "presente comprado"?')) return;
+  gravarLocal(COMPREI, comprei);
+  E.comprados = Math.max(0, (Number(E.comprados) || 0) + (comprei ? 1 : -1));
+  mostrarCompras();
+  if (comprei) { b.classList.remove('pulou'); void b.offsetWidth; b.classList.add('pulou'); }
+  b.dataset.ocupado = '1';
+  try {
+    const r = await api({ acao: 'comprei', comprei: comprei, quem: idAparelho() });
+    E.comprados = Number(r.comprados) || 0;
+    rastrear(comprei ? 'presente_comprado' : 'presente_desmarcado');
+  } catch (e) {
+    gravarLocal(COMPREI, !comprei);
+    E.comprados = Math.max(0, (Number(E.comprados) || 0) + (comprei ? -1 : 1));
+    b.classList.remove('pulou');
+    alert(e.message);
+  } finally {
+    delete b.dataset.ocupado;
+    mostrarCompras();
+  }
+});
 
 function blocoPerguntas(nome, souEu) {
   const qs = E.perguntas.filter((q) => q.para === nome)
