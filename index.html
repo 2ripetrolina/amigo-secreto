@@ -706,6 +706,27 @@
   .lista .cabeca { text-align: center; margin-bottom: 36px; position: relative; z-index: 1; }
   .lista .cabeca h2 { margin: 12px 0 0; font-size: clamp(22px, 4.6vw, 58px); line-height: 1.5; }
   .aviao { position: absolute; width: 90px; left: 38%; top: 54px; opacity: .95; }
+  /* aviãozinho cobrador: cruza o céu puxando uma faixa com o nome de quem ainda não mandou sugestão (o JS move e troca o nome) */
+  .com-reboque > .aviao { display: none; }
+  .reboque { position: absolute; z-index: 1; left: 0; top: 30px; transform: translateX(-100%); pointer-events: none; will-change: transform; }
+  .reboque[hidden] { display: none; }
+  .reboque-voo { display: flex; align-items: center; animation: reboque-balanco 3.4s ease-in-out infinite; }
+  @keyframes reboque-balanco { 0%, 100% { translate: 0 0; rotate: 0deg; } 30% { translate: 0 -7px; rotate: -1.2deg; } 70% { translate: 0 5px; rotate: 1deg; } }
+  .faixa-pano { position: relative; overflow: hidden; padding: 7px 16px 6px 14px; white-space: nowrap;
+                font: 400 15px/1.2 var(--display); letter-spacing: .04em; text-transform: uppercase; color: var(--navy);
+                background: var(--creme); border-right: 3px solid #b08a52; border-radius: 2px 0 0 2px;
+                box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .55);
+                transform-origin: 100% 50%; animation: faixa-tremula .9s ease-in-out infinite alternate; }
+  .faixa-pano b { font-weight: inherit; color: var(--celeste); }
+  /* dobras do pano correndo para trás com o vento */
+  .faixa-pano::after { content: ""; position: absolute; inset: 0 -120px 0 0; translate: 0 0;
+                       background: repeating-linear-gradient(90deg, rgba(0, 25, 65, 0) 0, rgba(0, 25, 65, .1) 30px, rgba(255, 255, 255, .25) 45px, rgba(0, 25, 65, 0) 60px);
+                       animation: faixa-dobras .8s linear infinite; }
+  @keyframes faixa-dobras { to { translate: 60px 0; } }
+  @keyframes faixa-tremula { from { transform: perspective(400px) rotateY(-6deg) skewY(-1.2deg); } to { transform: perspective(400px) rotateY(5deg) skewY(1deg); } }
+  .faixa-corda { width: 34px; height: 0; border-top: 1.5px solid rgba(255, 255, 255, .75); rotate: -6deg; }
+  .reboque-aviao { width: 64px; margin: -14px 0 0 -3px; rotate: 6deg; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .3)); }
+  @media (max-width: 600px) { .reboque { top: 22px; } .faixa-pano { font-size: 12.5px; padding: 6px 12px 5px 10px; } .reboque-aviao { width: 50px; } }
   .nuvem-alta { position: absolute; fill: #c9c4f2; opacity: .55; }
 
   .painel {
@@ -1308,6 +1329,13 @@
   <svg class="nuvem-alta" style="left:8%;top:40px;width:180px" aria-hidden="true"><use href="#i-nuvem"/></svg>
   <svg class="nuvem-alta" style="right:4%;top:120px;width:220px" aria-hidden="true"><use href="#i-nuvem"/></svg>
   <svg class="aviao" viewBox="0 0 100 50" aria-hidden="true"><path d="M2 24 98 2 40 30z" fill="#fff"/><path d="M40 30 98 2 52 46z" fill="#e8e2f7"/><path d="M40 30l6 16 6-2z" fill="#b9b2ee"/></svg>
+  <div class="reboque" id="reboque" aria-hidden="true" hidden>
+    <div class="reboque-voo">
+      <span class="faixa-pano" id="faixa-pano"></span>
+      <i class="faixa-corda"></i>
+      <svg class="reboque-aviao" viewBox="0 0 100 50"><path d="M2 24 98 2 40 30z" fill="#fff"/><path d="M40 30 98 2 52 46z" fill="#e8e2f7"/><path d="M40 30l6 16 6-2z" fill="#b9b2ee"/></svg>
+    </div>
+  </div>
 
   <div class="container">
     <div class="cabeca">
@@ -1918,6 +1946,46 @@ function cartaoPresente(p, minhas, posicao, total, podeOrdenar) {
   ]);
 }
 
+// Aviãozinho cobrador: a cada passagem pelo céu da lista, leva na faixa o nome de alguém que ainda não mandou sugestão
+// (ordem embaralhada, sem repetir até passar por todos). Só voa com a seção na tela; com "reduzir movimento", fica o avião parado.
+const Reboque = (() => {
+  const secao = $('lista'), caixa = $('reboque'), pano = $('faixa-pano');
+  const FRASES = [', cadê sua sugestão? ✈', ', o amigo secreto tá esperando! ✈', ', cadê sua sugestão? ✈', ', bora mandar a lista! ✈'];
+  const VELOCIDADE = 95, PAUSA = 3500;                          // px/s e ms entre uma passagem e outra
+  const calmo = matchMedia('(prefers-reduced-motion: reduce)');
+  let nomes = null, fila = [], frase = 0, voando = false, visivel = false;
+  const curto = (n) => n.trim().split(/\s+/).filter((p, i) => i === 0 || !/^(d[aeo]s?|e)$/i.test(p)).slice(0, 2).join(' ');
+  const embaralhar = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+  function escrever() {
+    if (!nomes.length) { pano.textContent = 'Todo mundo já mandou sugestão! 🎉'; return; }
+    if (!fila.length) fila = embaralhar(nomes.slice());
+    pano.replaceChildren(el('b', { text: curto(fila.shift()) }), FRASES[frase++ % FRASES.length]);
+  }
+  async function voar() {
+    if (voando || !visivel || nomes === null || calmo.matches) return;
+    voando = true; caixa.hidden = false; secao.classList.add('com-reboque');
+    while (visivel && !calmo.matches) {
+      escrever();
+      const larg = caixa.offsetWidth, total = secao.clientWidth;
+      const a = caixa.animate([{ transform: `translateX(${-larg}px)` }, { transform: `translateX(${total}px)` }],
+                           { duration: (total + larg) / VELOCIDADE * 1000, easing: 'linear' });
+      try { await a.finished; } catch (e) { break; }
+      await espera(PAUSA);
+    }
+    voando = false;
+    if (calmo.matches) { caixa.hidden = true; secao.classList.remove('com-reboque'); }
+  }
+  new IntersectionObserver(([e]) => { visivel = e.isIntersecting; voar(); }).observe(secao);
+  return {
+    atualizar(faltam) {
+      nomes = faltam.slice();
+      fila = fila.filter((n) => nomes.includes(n));                 // quem acabou de mandar sai da fila
+      voar();
+    },
+  };
+})();
+
 function render() {
   // progresso (hero + painel)
   const comPedido = new Set(E.pedidos.map((p) => p.nome));
@@ -1938,6 +2006,7 @@ function render() {
   $('barra-pct').lastChild.textContent = pct >= 100 ? ' concluído 🎉' : ' concluído';
   $('faltam').hidden = !faltam.length;
   $('qtd-faltam').textContent = faltam.length;
+  Reboque.atualizar(faltam);
   $('faltam-lista').replaceChildren(...faltam.map((n) => el('span', { class: 'chip', text: n })));
 
   // filtros
