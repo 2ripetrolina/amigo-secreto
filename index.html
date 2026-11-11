@@ -477,6 +477,17 @@
   .evento { margin: 30px auto 0; }
   .evento-data { margin: 0; font: 700 clamp(14px, 1.8vw, 17px)/1.4 var(--texto); }
   .evento-local { margin: 6px 0 0; font: 500 clamp(13px, 1.6vw, 15px)/1.4 var(--texto); opacity: .92; }
+  /* prazo das sugestões: aviso no topo; depois dele (body.encerrado) some tudo que envia ou altera algo */
+  .evento-prazo { display: inline-block; margin: 12px 0 0; padding: 5px 12px; border-radius: 99px; font: 600 clamp(13px, 1.6vw, 15px)/1.4 var(--texto);
+                  background: rgba(254, 210, 97, .18); box-shadow: inset 0 0 0 1px rgba(254, 210, 97, .55); }
+  .evento-prazo b { color: var(--amarelo); }
+  .prazo-fechado { max-width: 560px; margin: 0 auto; padding: 22px 24px; text-align: center; border-radius: 10px; background: var(--branco); color: var(--navy);
+                   box-shadow: 0 0 0 1px var(--linha), 0 14px 30px -18px rgba(0, 25, 65, .45); }
+  .prazo-fechado .icone { font-size: 34px; }
+  .prazo-fechado p { margin: 8px 0 0; color: var(--ardosia); }
+  .prazo-fechado .btn { margin-top: 16px; }
+  .encerrado #form, .encerrado #btn-perguntar, .encerrado #btn-acesso, .encerrado #alerta-perguntas,
+  .encerrado .nav-links a[href="#enviar"] { display: none !important; }
   .evento-rotulo { display: inline-block; font: 700 10px/1 var(--texto); letter-spacing: .08em; text-transform: uppercase;
                    background: var(--amarelo); color: var(--navy); border-radius: 4px; padding: 5px 7px; margin-right: 10px; vertical-align: 2px; }
   .contagem { display: flex; justify-content: center; gap: clamp(8px, 2vw, 14px); margin-top: 16px; }
@@ -1108,6 +1119,7 @@
     <div class="evento">
       <p class="evento-data"><span class="evento-rotulo">A troca</span>Sábado, 5 de dezembro · a partir das 17:00</p>
       <p class="evento-local">📍 Casa Brasilis Eventos · <a href="#festa" style="color:inherit">ver o convite ↓</a></p>
+      <p class="evento-prazo" id="prazo-hero">⏰ Sugestões até <b>quinta, 12/11, às 23:59</b></p>
       <div class="contagem" id="contagem" aria-hidden="true">
         <div><b id="cd-dias">--</b><span>dias</span></div>
         <div><b id="cd-horas">--</b><span>horas</span></div>
@@ -1134,7 +1146,7 @@
         <div><div class="rotulo">Sugestões</div><div class="valor" id="hero-sugestoes">—</div></div>
         <div><div class="rotulo">Valor mínimo</div><div class="valor valor-min">R$ 150</div></div>
       </div>
-      <a class="btn" href="#enviar">Enviar minha sugestão</a>
+      <a class="btn" href="#enviar" id="hero-btn">Enviar minha sugestão</a>
     </div>
   </div>
 </header>
@@ -1250,6 +1262,14 @@
         <p><strong>O presente</strong>, sem erro: mande até 6 ideias, com link da loja (ou vários, se for um combo), foto e detalhes como tamanho e cor.</p>
         <p class="valor-aviso"><strong>Valor mínimo: R$ 150,00.</strong> Sugira presentes a partir desse valor.</p>
       </div>
+    </div>
+
+    <div class="prazo-fechado" id="prazo-fechado" hidden>
+      <div class="icone" aria-hidden="true">🔒</div>
+      <h2 class="display">Lista fechada</h2>
+      <p>O prazo para mandar e alterar sugestões terminou na quinta, 12/11, às 23:59.
+         A lista continua aberta para consulta: é só escolher o presente de quem você tirou. 🎁</p>
+      <a class="btn" href="#lista">Ver a lista</a>
     </div>
 
     <form class="postal" id="form" novalidate>
@@ -1386,7 +1406,7 @@
 <footer class="rodape">
   <div class="container">
     <p class="display">Feliz amigo secreto! 🎁</p>
-    <p>As sugestões ficam guardadas numa planilha da organização. Você pode editar ou apagar as suas neste mesmo aparelho.</p>
+    <p id="rodape-txt">As sugestões ficam guardadas numa planilha da organização. Você pode editar ou apagar as suas neste mesmo aparelho.</p>
     <button class="btn claro" id="btn-atualizar">Atualizar a lista</button>
     <p class="rodape-cookies"><button type="button" class="link-cookies" id="abrir-cookies">Preferências de cookies</button></p>
   </div>
@@ -1469,8 +1489,34 @@ function novidade(p, minhas) {
 // ══════════════════════════════════════════════════════════════
 // API
 // ══════════════════════════════════════════════════════════════
+// ── prazo: até lá dá para mandar, editar, apagar, reordenar, perguntar e responder; depois a lista fica só para consulta.
+// O servidor também recusa as alterações depois do prazo e manda o horário dele (que vale mais que este, se mudar).
+const PRAZO = new Date('2026-11-12T23:59:59-03:00').getTime();   // horário de Petrolina (UTC-3)
+const MSG_PRAZO = 'O prazo para sugestões terminou na quinta, 12/11, às 23:59. A lista agora é só para consulta.';
+const ESCRITAS = ['criar', 'editar', 'apagar', 'reordenar', 'perguntar', 'responder', 'apagarPergunta', 'definirPin'];
+let prazoServidor = 0;
+const encerrado = () => Date.now() > (prazoServidor || PRAZO);
+function aplicarPrazo() {
+  const fim = encerrado();
+  if (aplicarPrazo.estado === fim) return;
+  aplicarPrazo.estado = fim;
+  document.body.classList.toggle('encerrado', fim);
+  $('prazo-fechado').hidden = !fim;
+  $('prazo-hero').innerHTML = fim ? '🔒 Sugestões encerradas · <b>a lista segue aberta para consulta</b>'
+                                  : '⏰ Sugestões até <b>quinta, 12/11, às 23:59</b>';
+  $('hero-btn').textContent = fim ? 'Ver a lista' : 'Enviar minha sugestão';
+  $('hero-btn').setAttribute('href', fim ? '#lista' : '#enviar');
+  $('rodape-txt').textContent = fim ? 'As sugestões ficam guardadas numa planilha da organização. O prazo terminou: a lista agora é só para consulta.'
+    : 'As sugestões ficam guardadas numa planilha da organização. Você pode editar ou apagar as suas neste mesmo aparelho.';
+  if (fim) {
+    ['dlg-pergunta', 'dlg-acesso'].forEach((id) => { const d = $(id); if (d.open) { if (d.close) d.close(); else d.removeAttribute('open'); } });
+    if (E.liberado) render();                       // tira os botões de editar/apagar/ordenar/responder dos cartões
+  }
+}
+
 // o código do grupo vai em toda chamada; o servidor confere e recusa sem ele
 async function api(dados) {
+  if (dados && ESCRITAS.indexOf(dados.acao) >= 0 && encerrado()) { aplicarPrazo(); throw new Error(MSG_PRAZO); }
   const opts = dados
     ? { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(Object.assign({ codigo: E.codigo }, dados)) }
@@ -1497,6 +1543,7 @@ async function carregar(silencioso) {
     E.participantes = j.participantes || [];
     E.pedidos = j.pedidos || [];
     E.perguntas = j.perguntas || [];
+    if (Number(j.prazo) > 0) { prazoServidor = Number(j.prazo); aplicarPrazo(); }
     registrarVistos();
     liberar();
     montarNomes();
@@ -1896,7 +1943,9 @@ function podeOrdenarNome(nome) {
 const opcaoTxt = (n) => n + 'ª opção';
 
 function cartaoPresente(p, minhas, posicao, total, podeOrdenar) {
-  const meu = !!minhas[p.id] || !!tokenDe(p.nome);
+  const aberto = !encerrado();
+  const meu = aberto && (!!minhas[p.id] || !!tokenDe(p.nome));
+  podeOrdenar = podeOrdenar && aberto;
   const nov = novidade(p, minhas);
   const imagem = p.imagem
     ? el('img', { src: p.imagem, alt: p.presente, loading: 'lazy', referrerpolicy: 'no-referrer',
@@ -1958,6 +2007,7 @@ const Reboque = (() => {
   const embaralhar = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const espera = (ms) => new Promise((r) => setTimeout(r, ms));
   function escrever() {
+    if (encerrado()) { pano.textContent = 'Lista fechada! Agora é com o amigo secreto 🎁'; return; }
     if (!nomes.length) { pano.textContent = 'Todo mundo já mandou sugestão! 🎉'; return; }
     if (!fila.length) fila = embaralhar(nomes.slice());
     pano.replaceChildren(el('b', { text: curto(fila.shift()) }), FRASES[frase++ % FRASES.length]);
@@ -2026,7 +2076,7 @@ function render() {
   // aviso de perguntas esperando resposta de quem usa este aparelho
   const meus = meusNomes();
   const pendentes = E.perguntas.filter((q) => meus.has(q.para) && !q.resposta);
-  $('alerta-perguntas').hidden = !pendentes.length;
+  $('alerta-perguntas').hidden = !pendentes.length || encerrado();
   $('alerta-perguntas-txt').textContent = pendentes.length === 1
     ? '📬 Você tem 1 pergunta anônima esperando resposta.'
     : '📬 Você tem ' + pendentes.length + ' perguntas anônimas esperando resposta.';
@@ -2054,7 +2104,7 @@ function render() {
     return el('section', { class: 'pessoa', id: 'pessoa-' + normalizar(nome).replace(/[^a-z0-9]+/g, '-') }, [
       el('h3', { class: 'display' }, [document.createTextNode(nome),
         el('small', { text: ps.length ? ps.length + (ps.length === 1 ? ' sugestão' : ' sugestões') + (todas.length > 1 ? ' · em ordem de preferência' : '') : '' })]),
-      podeOrdenar ? el('p', { class: 'dica-ordem', text: 'Toque na etiqueta “1ª opção” dos seus cards (ou use ◀ ▶) para escolher a ordem: a 1ª é a que você mais quer.' }) : null,
+      podeOrdenar && !encerrado() ? el('p', { class: 'dica-ordem', text: 'Toque na etiqueta “1ª opção” dos seus cards (ou use ◀ ▶) para escolher a ordem: a 1ª é a que você mais quer.' }) : null,
       ps.length ? el('div', { class: 'grade' }, ps.map((p) =>
                     cartaoPresente(p, minhas, todas.findIndex((x) => x.id === p.id) + 1, todas.length, podeOrdenar)))
                 : el('p', { class: 'sem-sugestao', text: meus.has(nome) ? 'Você ainda não mandou sugestões.' : 'Ainda não mandou sugestões.' }),
@@ -2086,11 +2136,12 @@ function provaDe(nome) {
 function blocoPerguntas(nome, souEu) {
   const qs = E.perguntas.filter((q) => q.para === nome)
     .sort((a, b) => String(a.criadoEm).localeCompare(String(b.criadoEm)));
+  if (!qs.length && encerrado()) return null;                 // lista fechada: sem perguntas, nada a mostrar
   const cab = el('div', { class: 'perguntas-cab' }, [
     el('span', {}, qs.length
       ? [el('b', { text: '💬 ' + qs.length + (qs.length === 1 ? ' pergunta anônima' : ' perguntas anônimas') })]
       : [document.createTextNode(souEu ? 'Ninguém te perguntou nada ainda.' : 'Ficou com dúvida sobre o que ' + nome + ' quer?')]),
-    souEu ? null : el('button', { type: 'button', class: 'link-btn', text: 'Perguntar anonimamente', onclick: () => abrirPergunta(nome) }),
+    souEu || encerrado() ? null : el('button', { type: 'button', class: 'link-btn', text: 'Perguntar anonimamente', onclick: () => abrirPergunta(nome) }),
   ]);
   return el('div', { class: 'perguntas' }, [
     cab,
@@ -2101,7 +2152,9 @@ function blocoPerguntas(nome, souEu) {
 function itemPergunta(q, souEu) {
   const filhos = [el('p', { class: 'q', text: q.pergunta })];
   if (q.resposta) filhos.push(el('p', { class: 'r', text: q.resposta }));
-  if (souEu && !q.resposta) {
+  if (encerrado()) {
+    if (!q.resposta) filhos.push(el('p', { class: 'espera', text: 'Ficou sem resposta.' }));
+  } else if (souEu && !q.resposta) {
     const txt = el('textarea', { maxlength: '400', placeholder: 'Sua resposta (aparece para todo mundo)', 'aria-label': 'Resposta' });
     const btn = el('button', { type: 'button', class: 'btn pequeno', text: 'Responder' });
     const msg = el('span', { class: 'espera' });
@@ -2357,6 +2410,10 @@ function contagem() {
   return true;
 }
 if (contagem()) { const t = setInterval(() => { if (!contagem()) clearInterval(t); }, 1000); }
+
+// fecha a lista na hora do prazo, mesmo com a página aberta
+aplicarPrazo();
+{ const t = setInterval(() => { if (encerrado()) { aplicarPrazo(); clearInterval(t); } }, 15000); }
 
 // atualiza o mural sozinho a cada 2 min (sem atrapalhar quem está digitando)
 setInterval(() => { if (E.liberado && !document.hidden && !E.enviando) carregar(true); }, 120000);
